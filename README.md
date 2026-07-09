@@ -3,7 +3,19 @@
 A personal video poker game — full-pay 9/6 Jacks or Better, the same game as the
 casino machines. Built with React + TypeScript + Vite.
 
-## Play
+**Play it live: https://jaredkjar.github.io/video-poker/**
+
+## Deploy
+
+Hosted on GitHub Pages. To ship a new version:
+
+```
+npm run deploy
+```
+
+(builds and pushes `dist/` to the `gh-pages` branch — live in about a minute)
+
+## Run locally
 
 ```
 npm install
