@@ -1,5 +1,30 @@
-import { useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { Marquee } from './Marquee';
+
+/**
+ * Site-wide visit total from GoatCounter's public counter endpoint.
+ * Stays null (and the label stays hidden) until it loads; any failure —
+ * service down, ad blocker, counter not public yet — is silent.
+ */
+function useVisitCount() {
+  const [visits, setVisits] = useState<number | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch('https://jacksorbetter.goatcounter.com/counter/TOTAL.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        // count arrives as a display string like "12 345"
+        const n = Number(String(data.count).replace(/\D/g, ''));
+        if (n > 0) setVisits(n);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return visits;
+}
 
 export interface ProfileSummary {
   name: string;
@@ -35,6 +60,7 @@ function GearIcon() {
 
 export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings, onHowTo }: Props) {
   const [name, setName] = useState('');
+  const visits = useVisitCount();
   const trimmed = name.trim();
   const existing = trimmed
     ? users.find((u) => u.name.toLowerCase() === trimmed.toLowerCase())
@@ -165,6 +191,7 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings, onH
 
         <p className="login-foot">
           For entertainment &amp; practice only — play money, no cash value.
+          {visits !== null && <> · {visits.toLocaleString()} visits</>}
         </p>
       </div>
     </main>
