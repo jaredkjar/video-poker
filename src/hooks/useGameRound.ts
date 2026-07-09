@@ -9,6 +9,11 @@ import {
 } from '../game/cards';
 import * as sounds from '../game/sounds';
 import type { StrategyHandle } from './useStrategyWorker';
+import type { Celebration } from '../components/WinOverlay';
+
+// Multiplier (payout ÷ bet) at or above which a win earns a celebratory overlay.
+const CELEBRATE_AT = 6; // flush and better
+const BIG_WIN_AT = 25; // four of a kind and better
 
 const HAND_SIZE = 5;
 const ALL_FALSE = Array<boolean>(HAND_SIZE).fill(false);
@@ -49,9 +54,19 @@ export function useGameRound(deps: GameRoundDeps) {
   const [win, setWin] = useState(0);
   const [winRank, setWinRank] = useState<number | null>(null);
   const [hintMask, setHintMask] = useState<number | null>(null);
+  const [celebration, setCelebration] = useState<Celebration | null>(null);
 
   const busyRef = useRef(false);
   const deckRef = useRef<Card[]>([]);
+  const celebrationTimer = useRef<number | null>(null);
+
+  const clearCelebration = () => {
+    if (celebrationTimer.current !== null) {
+      clearTimeout(celebrationTimer.current);
+      celebrationTimer.current = null;
+    }
+    setCelebration(null);
+  };
 
   const setCardFace = (i: number, up: boolean) =>
     setFaceUp((f) => f.map((v, j) => (j === i ? up : v)));
@@ -70,6 +85,7 @@ export function useGameRound(deps: GameRoundDeps) {
     setTrainerNote('');
     setHeld(ALL_FALSE);
     setMessage('');
+    clearCelebration();
 
     if (faceUp.some(Boolean)) {
       setFaceUp(ALL_FALSE);
@@ -137,8 +153,18 @@ export function useGameRound(deps: GameRoundDeps) {
     setWin(amount);
     if (amount > 0) {
       deps.addWinnings(amount);
-      sounds.win(amount / deps.bet);
+      const multiplier = amount / deps.bet;
+      sounds.win(multiplier);
       setMessage(`${HAND_NAMES[rank]} — you win ${deps.formatMoney(amount)}!`);
+      if (multiplier >= CELEBRATE_AT) {
+        const tier = multiplier >= BIG_WIN_AT ? 'big' : 'nice';
+        if (tier === 'big') sounds.jackpot();
+        setCelebration({ name: HAND_NAMES[rank], amount: deps.formatMoney(amount), tier });
+        celebrationTimer.current = window.setTimeout(
+          () => setCelebration(null),
+          tier === 'big' ? 4500 : 3000,
+        );
+      }
     } else {
       sounds.lose();
       setMessage('Game over — press DEAL to play again');
@@ -200,6 +226,7 @@ export function useGameRound(deps: GameRoundDeps) {
     setHintMask(null);
     setTrainerNote('');
     setMessage(welcome);
+    clearCelebration();
     busyRef.current = false;
     setBusy(false);
   };
@@ -216,6 +243,7 @@ export function useGameRound(deps: GameRoundDeps) {
     win,
     winRank,
     hintMask,
+    celebration,
     deal,
     draw,
     toggleHold,

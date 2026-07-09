@@ -4,6 +4,7 @@ import { useState } from 'react';
 const FEEDBACK_EMAIL = atob('amFyZWRramFyQGdtYWlsLmNvbQ==');
 const ENDPOINT = `https://formsubmit.co/ajax/${FEEDBACK_EMAIL}`;
 const SUBJECT = 'Video Poker feedback';
+const SEND_TIMEOUT_MS = 9000;
 
 interface Props {
   user: string;
@@ -19,14 +20,20 @@ export function FeedbackModal({ user, onClose }: Props) {
 
   const mailtoHref =
     `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(SUBJECT)}` +
-    `&body=${encodeURIComponent(message)}`;
+    `&body=${encodeURIComponent(`${message}\n\n— ${user}${replyTo ? ` (${replyTo})` : ''}`)}`;
 
   const send = async () => {
     if (!message.trim() || status === 'sending') return;
     setStatus('sending');
+
+    // Hard timeout so a slow or unreachable relay can never leave the button
+    // stuck on "Sending…" — we fall back to the email-app path instead.
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), SEND_TIMEOUT_MS);
     try {
       const res = await fetch(ENDPOINT, {
         method: 'POST',
+        signal: controller.signal,
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           _subject: SUBJECT,
@@ -42,6 +49,8 @@ export function FeedbackModal({ user, onClose }: Props) {
       setStatus('sent');
     } catch {
       setStatus('error');
+    } finally {
+      clearTimeout(timer);
     }
   };
 
@@ -83,23 +92,39 @@ export function FeedbackModal({ user, onClose }: Props) {
               value={replyTo}
               onChange={(e) => setReplyTo(e.target.value)}
             />
-            {status === 'error' && (
-              <p className="modal-note">
-                Couldn't send right now — try again, or{' '}
-                <a href={mailtoHref}>email directly</a>.
-              </p>
+
+            {status === 'error' ? (
+              <>
+                <p className="modal-note">
+                  Couldn't send from here right now — send it straight from your email app instead:
+                </p>
+                <a className="send-btn" href={mailtoHref}>
+                  Email it to Jared
+                </a>
+                <button
+                  type="button"
+                  className="modal-link"
+                  onClick={() => void send()}
+                  disabled={!message.trim()}
+                >
+                  Try sending in-app again
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="send-btn"
+                  disabled={!message.trim() || status === 'sending'}
+                  onClick={() => void send()}
+                >
+                  {status === 'sending' ? 'Sending…' : 'Send feedback'}
+                </button>
+                <a className="modal-link" href={mailtoHref}>
+                  Or send with your email app
+                </a>
+              </>
             )}
-            <button
-              type="button"
-              className="send-btn"
-              disabled={!message.trim() || status === 'sending'}
-              onClick={() => void send()}
-            >
-              {status === 'sending' ? 'Sending…' : 'Send feedback'}
-            </button>
-            <a className="modal-link" href={mailtoHref}>
-              Send with your email app instead
-            </a>
           </>
         )}
       </div>

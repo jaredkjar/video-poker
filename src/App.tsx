@@ -13,6 +13,9 @@ import { CardView } from './components/CardView';
 import { Paytable } from './components/Paytable';
 import { Console } from './components/Console';
 import { StatusBar } from './components/StatusBar';
+import { AccountMenu } from './components/AccountMenu';
+import { WinOverlay } from './components/WinOverlay';
+import { GearIcon } from './components/icons';
 import { CreditsModal } from './components/CreditsModal';
 import { LoginScreen, type ProfileSummary } from './components/LoginScreen';
 import { ConfirmModal } from './components/ConfirmModal';
@@ -231,6 +234,27 @@ export default function App() {
   return (
     <div className="app">
       <main className="machine">
+        <div className="topbar">
+          <button
+            type="button"
+            className="icon-btn"
+            title="Settings"
+            aria-label="Settings"
+            onClick={() => setSettingsOpen(true)}
+          >
+            <GearIcon />
+          </button>
+          <AccountMenu
+            userLabel={userLabel}
+            isGuest={profiles.isGuest}
+            statsSummary={statsSummary}
+            onStats={() => setStatsOpen(true)}
+            onHowTo={() => setHowToOpen(true)}
+            onFeedback={() => setFeedbackOpen(true)}
+            onSignOut={handleSignOut}
+          />
+        </div>
+
         <Marquee />
 
         <Paytable bet={bet} winRank={game.winRank} />
@@ -279,14 +303,6 @@ export default function App() {
           onToggleSound={() => profiles.setSoundOn((v) => !v)}
           onToggleTrainer={() => setTrainer((v) => !v)}
           onToggleDollars={() => profiles.setDollars((v) => !v)}
-          statsSummary={statsSummary}
-          userLabel={userLabel}
-          isGuest={profiles.isGuest}
-          onStats={() => setStatsOpen(true)}
-          onSettings={() => setSettingsOpen(true)}
-          onFeedback={() => setFeedbackOpen(true)}
-          onHowTo={() => setHowToOpen(true)}
-          onSignOut={handleSignOut}
         />
 
         <p className="disclaimer">
@@ -294,6 +310,8 @@ export default function App() {
           from a full 52-card deck with a cryptographic shuffle; the 9/6 paytable returns 99.54%
           with optimal play.
         </p>
+
+        {game.celebration && <WinOverlay {...game.celebration} />}
       </main>
 
       {modalOpen && (
