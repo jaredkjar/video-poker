@@ -1,5 +1,7 @@
 // Per-player profiles and stats, persisted in localStorage.
 
+import { isTextSizeId, isThemeId, loadPrefs, type TextSizeId, type ThemeId } from './prefs';
+
 export interface Stats {
   hands: number;
   handsWon: number;
@@ -20,6 +22,9 @@ export interface SaveData {
   sound: boolean;
   dollars: boolean;
   denom: number;
+  trainer: boolean;
+  theme: ThemeId;
+  textSize: TextSizeId;
   stats: Stats;
 }
 
@@ -57,12 +62,18 @@ function normalizeStats(s?: Partial<Stats>): Stats {
 }
 
 export function defaultSave(): SaveData {
+  // New profiles (and guests) inherit the device's current look so signing
+  // up doesn't visibly change the table out from under you.
+  const prefs = loadPrefs();
   return {
     credits: 200,
     bet: 1,
     sound: true,
     dollars: false,
     denom: 0.25,
+    trainer: false,
+    theme: prefs.theme,
+    textSize: prefs.textSize,
     stats: emptyStats(),
   };
 }
@@ -103,7 +114,15 @@ export function loadProfile(name: string): SaveData {
     const raw = localStorage.getItem(userKey(name));
     if (raw) {
       const p = JSON.parse(raw) as Partial<SaveData>;
-      return { ...defaultSave(), ...p, stats: normalizeStats(p.stats) };
+      const base = defaultSave();
+      return {
+        ...base,
+        ...p,
+        theme: isThemeId(p.theme) ? p.theme : base.theme,
+        textSize: isTextSizeId(p.textSize) ? p.textSize : base.textSize,
+        trainer: typeof p.trainer === 'boolean' ? p.trainer : base.trainer,
+        stats: normalizeStats(p.stats),
+      };
     }
   } catch {
     // corrupted profile — fall through to defaults

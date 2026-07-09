@@ -1,4 +1,7 @@
-// Device-level display preferences (shared across player profiles).
+// Device-level display preferences. These only style the login screen and
+// seed brand-new profiles — once signed in, the player's own saved settings
+// win (see SaveData in stats.ts). Kept in sync so the login screen always
+// matches the last look used.
 
 export type ThemeId = 'emerald' | 'midnight' | 'ruby' | 'amethyst';
 export type TextSizeId = 'md' | 'lg' | 'xl';
@@ -11,6 +14,9 @@ export interface Prefs {
 const PREFS_KEY = 'video-poker-prefs-v1';
 const THEME_IDS: ThemeId[] = ['emerald', 'midnight', 'ruby', 'amethyst'];
 const SIZE_IDS: TextSizeId[] = ['md', 'lg', 'xl'];
+
+export const isThemeId = (v: unknown): v is ThemeId => THEME_IDS.includes(v as ThemeId);
+export const isTextSizeId = (v: unknown): v is TextSizeId => SIZE_IDS.includes(v as TextSizeId);
 
 export const DEFAULT_PREFS: Prefs = { theme: 'emerald', textSize: 'md' };
 

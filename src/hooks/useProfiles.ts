@@ -36,12 +36,25 @@ export function useProfiles() {
   const [soundOn, setSoundOn] = useState(boot.data.sound);
   const [dollars, setDollars] = useState(boot.data.dollars);
   const [denom, setDenom] = useState(boot.data.denom);
+  const [trainer, setTrainer] = useState(boot.data.trainer);
+  const [theme, setTheme] = useState(boot.data.theme);
+  const [textSize, setTextSize] = useState(boot.data.textSize);
   const [stats, setStats] = useState(boot.data.stats);
 
   useEffect(() => {
     if (!user || user === GUEST) return;
-    saveProfile(user, { credits, bet, sound: soundOn, dollars, denom, stats });
-  }, [user, credits, bet, soundOn, dollars, denom, stats]);
+    saveProfile(user, {
+      credits,
+      bet,
+      sound: soundOn,
+      dollars,
+      denom,
+      trainer,
+      theme,
+      textSize,
+      stats,
+    });
+  }, [user, credits, bet, soundOn, dollars, denom, trainer, theme, textSize, stats]);
 
   const applyProfile = (data: SaveData) => {
     setCredits(data.credits);
@@ -49,6 +62,9 @@ export function useProfiles() {
     setSoundOn(data.sound);
     setDollars(data.dollars);
     setDenom(data.denom);
+    setTrainer(data.trainer);
+    setTheme(data.theme);
+    setTextSize(data.textSize);
     setStats(data.stats);
   };
 
@@ -102,6 +118,12 @@ export function useProfiles() {
     setDollars,
     denom,
     setDenom,
+    trainer,
+    setTrainer,
+    theme,
+    setTheme,
+    textSize,
+    setTextSize,
     stats,
     setStats,
     login,

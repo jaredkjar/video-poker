@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { MAX_BET } from './game/cards';
+import { savePrefs } from './game/prefs';
 import { defaultSave, loadProfile } from './game/stats';
 import * as sounds from './game/sounds';
 import { useCountUp } from './hooks/useCountUp';
-import { usePrefs } from './hooks/usePrefs';
 import { useProfiles } from './hooks/useProfiles';
 import { useStrategyWorker } from './hooks/useStrategyWorker';
 import { useGameRound } from './hooks/useGameRound';
@@ -26,11 +26,7 @@ import { FeedbackModal } from './components/FeedbackModal';
 
 export default function App() {
   const profiles = useProfiles();
-  const { credits, setCredits, bet, setBet, dollars, denom, soundOn, stats } = profiles;
-
-  const [prefs, setPrefs] = usePrefs();
-  // Deliberately not persisted — the trainer starts off every session
-  const [trainer, setTrainer] = useState(false);
+  const { credits, setCredits, bet, setBet, dollars, denom, soundOn, stats, trainer } = profiles;
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalNote, setModalNote] = useState('');
@@ -56,6 +52,14 @@ export default function App() {
   useEffect(() => {
     sounds.setEnabled(soundOn);
   }, [soundOn]);
+
+  // Apply the signed-in player's look, and mirror it to device prefs so the
+  // login screen (and brand-new profiles) match the last look used.
+  useEffect(() => {
+    document.documentElement.dataset.theme = profiles.theme;
+    document.documentElement.dataset.textsize = profiles.textSize;
+    savePrefs({ theme: profiles.theme, textSize: profiles.textSize });
+  }, [profiles.theme, profiles.textSize]);
 
   const strategy = useStrategyWorker();
 
@@ -123,13 +127,11 @@ export default function App() {
   const handleLogin = (name: string) => {
     const finalName = profiles.login(name);
     if (!finalName) return;
-    setTrainer(false);
     game.resetRound(`Welcome, ${finalName} — press DEAL to play`);
   };
 
   const handleGuest = () => {
     profiles.playAsGuest();
-    setTrainer(false);
     game.resetRound('Guest mode — press DEAL to play');
   };
 
@@ -190,9 +192,12 @@ export default function App() {
 
   const settingsModal = settingsOpen && (
     <SettingsModal
-      prefs={prefs}
+      prefs={{ theme: profiles.theme, textSize: profiles.textSize }}
       denom={denom}
-      onPrefs={setPrefs}
+      onPrefs={(p) => {
+        profiles.setTheme(p.theme);
+        profiles.setTextSize(p.textSize);
+      }}
       onDenom={profiles.setDenom}
       onClose={() => setSettingsOpen(false)}
     />
@@ -301,7 +306,7 @@ export default function App() {
           trainer={trainer}
           dollars={dollars}
           onToggleSound={() => profiles.setSoundOn((v) => !v)}
-          onToggleTrainer={() => setTrainer((v) => !v)}
+          onToggleTrainer={() => profiles.setTrainer((v) => !v)}
           onToggleDollars={() => profiles.setDollars((v) => !v)}
         />
 
