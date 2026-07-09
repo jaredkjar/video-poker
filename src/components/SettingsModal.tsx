@@ -9,10 +9,10 @@ interface Props {
 }
 
 const THEMES: { id: ThemeId; name: string; swatch: string }[] = [
-  { id: 'emerald', name: 'Emerald', swatch: '#2b4a3c' },
-  { id: 'midnight', name: 'Midnight', swatch: '#31436b' },
-  { id: 'ruby', name: 'Ruby', swatch: '#6b3247' },
-  { id: 'amethyst', name: 'Amethyst', swatch: '#4d3579' },
+  { id: 'emerald', name: 'Emerald', swatch: '#2e7a52' },
+  { id: 'midnight', name: 'Midnight', swatch: '#33589e' },
+  { id: 'ruby', name: 'Ruby', swatch: '#93334f' },
+  { id: 'amethyst', name: 'Amethyst', swatch: '#6d43ad' },
 ];
 
 const SIZES: { id: TextSizeId; label: string }[] = [
