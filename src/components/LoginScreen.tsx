@@ -1,22 +1,29 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { Marquee } from './Marquee';
 
+const COUNTER = 'https://abacus.jasoncameron.dev';
+const COUNTER_KEY = 'jacksorbetter.dev/visits';
+
+// One increment per page load — signing out remounts this screen, and dev
+// StrictMode runs effects twice, so the flag lives at module scope.
+let counted = false;
+
 /**
- * Site-wide visit total from GoatCounter's public counter endpoint.
- * Stays null (and the label stays hidden) until it loads; any failure —
- * service down, ad blocker, counter not public yet — is silent.
+ * Site-wide visit total from the Abacus counter service. Only the live
+ * domain increments; localhost/dev just reads the current value. Stays
+ * null (and the label stays hidden) if the service is unreachable.
  */
 function useVisitCount() {
   const [visits, setVisits] = useState<number | null>(null);
   useEffect(() => {
     let cancelled = false;
-    fetch('https://jacksorbetter.goatcounter.com/counter/TOTAL.json')
+    const increment = location.hostname === 'jacksorbetter.dev' && !counted;
+    counted = true;
+    fetch(`${COUNTER}/${increment ? 'hit' : 'get'}/${COUNTER_KEY}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (cancelled || !data) return;
-        // count arrives as a display string like "12 345"
-        const n = Number(String(data.count).replace(/\D/g, ''));
-        if (n > 0) setVisits(n);
+        if (!cancelled && data && typeof data.value === 'number' && data.value > 0)
+          setVisits(data.value);
       })
       .catch(() => {});
     return () => {
@@ -191,7 +198,12 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings, onH
 
         <p className="login-foot">
           For entertainment &amp; practice only — play money, no cash value.
-          {visits !== null && <> · {visits.toLocaleString()} visits</>}
+          {visits !== null && (
+            <>
+              {' '}
+              · {visits.toLocaleString()} visit{visits === 1 ? '' : 's'}
+            </>
+          )}
         </p>
       </div>
     </main>
