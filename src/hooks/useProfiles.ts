@@ -78,8 +78,8 @@ export function useProfiles() {
     saveRegistry({ names: usersList, last: null });
   };
 
+  // Destructive and unprompted — callers are expected to confirm with the user first
   const deleteProfile = (name: string) => {
-    if (!window.confirm(`Delete profile "${name}" and all its stats?`)) return;
     deleteProfileData(name);
     const names = usersList.filter((n) => n !== name);
     setUsersList(names);

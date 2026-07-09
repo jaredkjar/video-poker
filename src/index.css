@@ -806,11 +806,32 @@ button {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
-.profile-name {
+.profile-info {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.profile-name {
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.1;
+}
+
+.profile-balance {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: calc(13.5px * var(--ts));
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-dim);
 }
 
 .profile-go {
@@ -1123,6 +1144,49 @@ button {
 .feedback-thanks {
   font-size: calc(16px * var(--ts));
   margin: 20px 0;
+}
+
+/* ---------- Confirm modal ---------- */
+
+.confirm-message {
+  margin-bottom: 24px;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.confirm-actions button {
+  flex: 1;
+  font: inherit;
+  font-size: calc(16px * var(--ts));
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  border-radius: 14px;
+  padding: 14px 0;
+  cursor: pointer;
+  transition: filter 0.12s ease, transform 0.08s ease;
+}
+
+.confirm-actions button:hover {
+  filter: brightness(1.15);
+}
+
+.confirm-actions button:active {
+  transform: translateY(2px);
+}
+
+.confirm-cancel {
+  color: #c6d0e2;
+  background: linear-gradient(180deg, var(--btn-hi), var(--btn-lo));
+  border: 1px solid rgba(147, 160, 184, 0.4);
+}
+
+.confirm-danger {
+  color: #2a0500;
+  background: linear-gradient(180deg, #ffa08e, #e05545 60%, #c23a2b);
+  border: none;
 }
 
 /* ---------- Settings modal ---------- */

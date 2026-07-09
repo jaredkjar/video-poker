@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { MAX_BET } from './game/cards';
-import { defaultSave } from './game/stats';
+import { defaultSave, loadProfile } from './game/stats';
 import * as sounds from './game/sounds';
 import { useCountUp } from './hooks/useCountUp';
 import { usePrefs } from './hooks/usePrefs';
@@ -14,7 +14,8 @@ import { Paytable } from './components/Paytable';
 import { Console } from './components/Console';
 import { StatusBar } from './components/StatusBar';
 import { CreditsModal } from './components/CreditsModal';
-import { LoginScreen } from './components/LoginScreen';
+import { LoginScreen, type ProfileSummary } from './components/LoginScreen';
+import { ConfirmModal } from './components/ConfirmModal';
 import { StatsModal } from './components/StatsModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FeedbackModal } from './components/FeedbackModal';
@@ -32,6 +33,12 @@ export default function App() {
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [confirmReq, setConfirmReq] = useState<{
+    title: string;
+    message: string;
+    confirmLabel: string;
+    action: () => void;
+  } | null>(null);
 
   const fmt = useCallback(
     (amount: number) => (dollars ? `$${(amount * denom).toFixed(2)}` : String(amount)),
@@ -95,7 +102,13 @@ export default function App() {
   const dealOrDraw = () => (game.phase === 'holding' ? void game.draw() : void game.deal(bet));
 
   useKeyboardControls({
-    active: !!profiles.user && !modalOpen && !statsOpen && !settingsOpen && !feedbackOpen,
+    active:
+      !!profiles.user &&
+      !modalOpen &&
+      !statsOpen &&
+      !settingsOpen &&
+      !feedbackOpen &&
+      !confirmReq,
     onHold: game.toggleHold,
     onPrimary: dealOrDraw,
     onHint: game.showHint,
@@ -132,15 +145,40 @@ export default function App() {
 
   const resetBalance = () => {
     const label = creditsWord(startingBalance);
-    if (!window.confirm(`Clear your balance and start over at ${label}? This can't be undone.`)) {
-      return;
-    }
-    setCredits(startingBalance);
     setModalOpen(false);
-    setModalNote('');
-    game.setMessage(`Balance reset to ${label}`);
-    sounds.blip();
+    setConfirmReq({
+      title: 'Clear balance?',
+      message: `Your balance will start over at ${label}. This can't be undone.`,
+      confirmLabel: 'Clear balance',
+      action: () => {
+        setCredits(startingBalance);
+        setModalNote('');
+        game.setMessage(`Balance reset to ${label}`);
+        sounds.blip();
+      },
+    });
   };
+
+  const requestDeleteProfile = (name: string) =>
+    setConfirmReq({
+      title: 'Delete profile?',
+      message: `"${name}" and all their credits and stats will be permanently deleted.`,
+      confirmLabel: 'Delete profile',
+      action: () => profiles.deleteProfile(name),
+    });
+
+  const confirmModal = confirmReq && (
+    <ConfirmModal
+      title={confirmReq.title}
+      message={confirmReq.message}
+      confirmLabel={confirmReq.confirmLabel}
+      onConfirm={() => {
+        confirmReq.action();
+        setConfirmReq(null);
+      }}
+      onClose={() => setConfirmReq(null)}
+    />
+  );
 
   const settingsModal = settingsOpen && (
     <SettingsModal
@@ -153,16 +191,26 @@ export default function App() {
   );
 
   if (!profiles.user) {
+    // Balances shown on the landing page — read fresh each time it renders
+    const profileSummaries: ProfileSummary[] = profiles.usersList.map((name) => {
+      const data = loadProfile(name);
+      return {
+        name,
+        balanceLabel: `${data.credits.toLocaleString()} credits · $${(data.credits * data.denom).toFixed(2)}`,
+      };
+    });
+
     return (
       <div className="app">
         <LoginScreen
-          users={profiles.usersList}
+          users={profileSummaries}
           onLogin={handleLogin}
           onGuest={handleGuest}
-          onDelete={profiles.deleteProfile}
+          onDelete={requestDeleteProfile}
           onSettings={() => setSettingsOpen(true)}
         />
         {settingsModal}
+        {confirmModal}
       </div>
     );
   }
@@ -252,6 +300,7 @@ export default function App() {
       )}
 
       {settingsModal}
+      {confirmModal}
 
       {feedbackOpen && (
         <FeedbackModal user={userLabel} onClose={() => setFeedbackOpen(false)} />

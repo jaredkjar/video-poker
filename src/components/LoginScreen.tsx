@@ -1,8 +1,14 @@
 import { useState, type CSSProperties } from 'react';
 import { Marquee } from './Marquee';
 
+export interface ProfileSummary {
+  name: string;
+  /** e.g. "1,234 credits · $308.50" */
+  balanceLabel: string;
+}
+
 interface Props {
-  users: string[];
+  users: ProfileSummary[];
   onLogin: (name: string) => void;
   onGuest: () => void;
   onDelete: (name: string) => void;
@@ -62,10 +68,13 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings }: P
         {users.length > 0 && (
           <div className="profiles">
             {users.map((u) => (
-              <div className="profile-row" key={u}>
-                <button type="button" className="profile-btn" onClick={() => onLogin(u)}>
-                  <span className="avatar">{u[0].toUpperCase()}</span>
-                  <span className="profile-name">{u}</span>
+              <div className="profile-row" key={u.name}>
+                <button type="button" className="profile-btn" onClick={() => onLogin(u.name)}>
+                  <span className="avatar">{u.name[0].toUpperCase()}</span>
+                  <span className="profile-info">
+                    <span className="profile-name">{u.name}</span>
+                    <span className="profile-balance">{u.balanceLabel}</span>
+                  </span>
                   <span className="profile-go" aria-hidden="true">
                     <svg
                       viewBox="0 0 24 24"
@@ -84,9 +93,9 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings }: P
                 <button
                   type="button"
                   className="profile-del"
-                  title={`Delete profile "${u}"`}
-                  aria-label={`Delete profile ${u}`}
-                  onClick={() => onDelete(u)}
+                  title={`Delete profile "${u.name}"`}
+                  aria-label={`Delete profile ${u.name}`}
+                  onClick={() => onDelete(u.name)}
                 >
                   <svg
                     viewBox="0 0 24 24"
