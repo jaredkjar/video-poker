@@ -710,8 +710,8 @@ button {
 /* Fanned royal flush centerpiece */
 .fan {
   position: relative;
-  width: 250px;
-  height: 118px;
+  width: 280px;
+  height: 124px;
   margin: 22px auto 8px;
 }
 
@@ -719,26 +719,51 @@ button {
   position: absolute;
   left: 50%;
   bottom: 6px;
-  width: 66px;
-  height: 94px;
+  width: 68px;
+  height: 95px;
   border-radius: 8px;
   background: linear-gradient(160deg, #ffffff, var(--card-face) 60%, #f0eee2);
   color: var(--suit-red);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 7px 0 0 9px;
-  font-weight: 800;
-  font-size: 17px;
-  line-height: 1.05;
   transform-origin: 50% 130%;
   transform: translateX(-50%) rotate(var(--rot));
-  box-shadow: -3px 4px 10px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    -4px 4px 10px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
-.fan-card span {
-  font-size: 18px;
+.fc-corner {
+  position: absolute;
+  top: 6px;
+  left: 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.fc-corner span + span {
+  font-size: 12px;
+  margin-top: 1.5px;
+}
+
+.fc-corner.br {
+  top: auto;
+  left: auto;
+  bottom: 6px;
+  right: 7px;
+  transform: rotate(180deg);
+}
+
+.fc-pip {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.12));
 }
 
 .login-panel {

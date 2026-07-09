@@ -17,11 +17,11 @@ interface Props {
 }
 
 const FAN_CARDS = [
-  { label: '10', rot: -26 },
-  { label: 'J', rot: -13 },
+  { label: '10', rot: -32 },
+  { label: 'J', rot: -16 },
   { label: 'Q', rot: 0 },
-  { label: 'K', rot: 13 },
-  { label: 'A', rot: 26 },
+  { label: 'K', rot: 16 },
+  { label: 'A', rot: 32 },
 ];
 
 function GearIcon() {
@@ -61,8 +61,15 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings, onH
             className="fan-card"
             style={{ '--rot': `${c.rot}deg` } as CSSProperties}
           >
-            {c.label}
-            <span>♥</span>
+            <div className="fc-corner">
+              <span>{c.label}</span>
+              <span>♥</span>
+            </div>
+            <div className="fc-pip">♥</div>
+            <div className="fc-corner br">
+              <span>{c.label}</span>
+              <span>♥</span>
+            </div>
           </div>
         ))}
       </div>
