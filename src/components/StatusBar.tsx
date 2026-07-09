@@ -11,6 +11,7 @@ interface Props {
   onStats: () => void;
   onSettings: () => void;
   onFeedback: () => void;
+  onHowTo: () => void;
   onSignOut: () => void;
 }
 
@@ -48,6 +49,7 @@ export function StatusBar({
   onStats,
   onSettings,
   onFeedback,
+  onHowTo,
   onSignOut,
 }: Props) {
   return (
@@ -58,6 +60,9 @@ export function StatusBar({
         <TogglePill label="Dollars" on={dollars} onClick={onToggleDollars} />
       </div>
       <div className="pill-group">
+        <button type="button" className="pill" onClick={onHowTo}>
+          How to play
+        </button>
         <button type="button" className="pill" title={statsSummary} onClick={onStats}>
           Stats
         </button>

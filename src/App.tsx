@@ -16,6 +16,7 @@ import { StatusBar } from './components/StatusBar';
 import { CreditsModal } from './components/CreditsModal';
 import { LoginScreen, type ProfileSummary } from './components/LoginScreen';
 import { ConfirmModal } from './components/ConfirmModal';
+import { HowToPlayModal } from './components/HowToPlayModal';
 import { StatsModal } from './components/StatsModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FeedbackModal } from './components/FeedbackModal';
@@ -33,6 +34,7 @@ export default function App() {
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [howToOpen, setHowToOpen] = useState(false);
   const [confirmReq, setConfirmReq] = useState<{
     title: string;
     message: string;
@@ -108,6 +110,7 @@ export default function App() {
       !statsOpen &&
       !settingsOpen &&
       !feedbackOpen &&
+      !howToOpen &&
       !confirmReq,
     onHold: game.toggleHold,
     onPrimary: dealOrDraw,
@@ -167,6 +170,8 @@ export default function App() {
       action: () => profiles.deleteProfile(name),
     });
 
+  const howToModal = howToOpen && <HowToPlayModal onClose={() => setHowToOpen(false)} />;
+
   const confirmModal = confirmReq && (
     <ConfirmModal
       title={confirmReq.title}
@@ -208,9 +213,11 @@ export default function App() {
           onGuest={handleGuest}
           onDelete={requestDeleteProfile}
           onSettings={() => setSettingsOpen(true)}
+          onHowTo={() => setHowToOpen(true)}
         />
         {settingsModal}
         {confirmModal}
+        {howToModal}
       </div>
     );
   }
@@ -278,6 +285,7 @@ export default function App() {
           onStats={() => setStatsOpen(true)}
           onSettings={() => setSettingsOpen(true)}
           onFeedback={() => setFeedbackOpen(true)}
+          onHowTo={() => setHowToOpen(true)}
           onSignOut={handleSignOut}
         />
 
@@ -301,6 +309,7 @@ export default function App() {
 
       {settingsModal}
       {confirmModal}
+      {howToModal}
 
       {feedbackOpen && (
         <FeedbackModal user={userLabel} onClose={() => setFeedbackOpen(false)} />

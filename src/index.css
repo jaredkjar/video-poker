@@ -1146,6 +1146,131 @@ button {
   margin: 20px 0;
 }
 
+/* ---------- How to play modal ---------- */
+
+.modal.howto-modal {
+  width: min(580px, 100%);
+  text-align: left;
+  max-height: 88vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 216, 115, 0.3) transparent;
+}
+
+.howto-modal h2,
+.howto-modal .modal-sub {
+  text-align: center;
+}
+
+.howto-modal h3 {
+  margin: 22px 0 10px;
+  font-size: calc(13.5px * var(--ts));
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.howto-steps {
+  margin: 0;
+  padding-left: 22px;
+  font-size: calc(15px * var(--ts));
+  line-height: 1.55;
+  color: #d5dce8;
+}
+
+.howto-steps li + li {
+  margin-top: 6px;
+}
+
+.howto-steps strong,
+.howto-tips strong {
+  color: var(--gold);
+}
+
+.howto-hands {
+  border: 1px solid rgba(255, 216, 115, 0.2);
+  border-radius: 12px;
+  background: rgba(5, 8, 15, 0.45);
+  padding: 4px 14px;
+}
+
+.howto-hand {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) auto;
+  gap: 12px;
+  align-items: baseline;
+  padding: 6.5px 0;
+  font-size: calc(14px * var(--ts));
+}
+
+.howto-hand + .howto-hand {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hh-name {
+  color: var(--gold);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.hh-desc {
+  color: var(--text-dim);
+}
+
+.hh-pays {
+  color: #ffe9b0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.howto-note {
+  margin: 10px 0 0;
+  font-size: calc(12.5px * var(--ts));
+  color: var(--text-dim);
+}
+
+.howto-tips {
+  margin: 0;
+  padding-left: 22px;
+  font-size: calc(15px * var(--ts));
+  line-height: 1.55;
+  color: #d5dce8;
+}
+
+.howto-tips li + li {
+  margin-top: 6px;
+}
+
+.howto-keys {
+  margin: 0;
+  font-size: calc(14px * var(--ts));
+  color: var(--text-dim);
+}
+
+.howto-keys kbd {
+  font-family: inherit;
+  background: rgba(5, 8, 15, 0.6);
+  border: 1px solid rgba(147, 160, 184, 0.35);
+  border-radius: 6px;
+  padding: 2px 7px;
+  color: #ffe9b0;
+  font-size: 0.9em;
+}
+
+.howto-link {
+  display: block;
+  margin: 18px auto 0;
+}
+
+.existing-note {
+  margin: 10px 0 0;
+  font-size: calc(13px * var(--ts));
+  color: var(--hint);
+  opacity: 0.9;
+}
+
 /* ---------- Confirm modal ---------- */
 
 .confirm-message {

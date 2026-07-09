@@ -13,6 +13,7 @@ interface Props {
   onGuest: () => void;
   onDelete: (name: string) => void;
   onSettings: () => void;
+  onHowTo: () => void;
 }
 
 const FAN_CARDS = [
@@ -32,8 +33,12 @@ function GearIcon() {
   );
 }
 
-export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings }: Props) {
+export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings, onHowTo }: Props) {
   const [name, setName] = useState('');
+  const trimmed = name.trim();
+  const existing = trimmed
+    ? users.find((u) => u.name.toLowerCase() === trimmed.toLowerCase())
+    : undefined;
 
   return (
     <main className="machine login">
@@ -120,7 +125,7 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings }: P
           className="new-profile"
           onSubmit={(e) => {
             e.preventDefault();
-            if (name.trim()) onLogin(name);
+            if (trimmed) onLogin(trimmed);
           }}
         >
           <input
@@ -130,10 +135,15 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings }: P
             maxLength={20}
             autoFocus={users.length === 0}
           />
-          <button type="submit" disabled={!name.trim()}>
-            {users.length > 0 ? 'Create' : "Let's play"}
+          <button type="submit" disabled={!trimmed}>
+            {existing ? 'Sign in' : users.length > 0 ? 'Create' : "Let's play"}
           </button>
         </form>
+        {existing && (
+          <p className="existing-note">
+            "{existing.name}" already exists — this signs in to that player's profile.
+          </p>
+        )}
 
         <div className="login-divider">or</div>
 
@@ -141,6 +151,10 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings }: P
           Play as Guest
         </button>
         <p className="guest-note">Guest credits and stats aren't saved.</p>
+
+        <button type="button" className="modal-link howto-link" onClick={onHowTo}>
+          New to video poker? How to play
+        </button>
 
         <p className="login-foot">
           For entertainment &amp; practice only — play money, no cash value.

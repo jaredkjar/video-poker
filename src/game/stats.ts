@@ -73,7 +73,19 @@ export function loadRegistry(): Registry {
     if (raw) {
       const r = JSON.parse(raw) as Partial<Registry>;
       if (Array.isArray(r.names)) {
-        return { names: r.names, last: typeof r.last === 'string' ? r.last : null };
+        // Drop blanks and case-insensitive duplicates — profiles that differ
+        // only by case share one storage key, so duplicate registry entries
+        // would render twice and delete each other's data.
+        const names: string[] = [];
+        const seen = new Set<string>();
+        for (const n of r.names) {
+          if (typeof n !== 'string') continue;
+          const trimmed = n.trim();
+          if (!trimmed || seen.has(trimmed.toLowerCase())) continue;
+          seen.add(trimmed.toLowerCase());
+          names.push(trimmed);
+        }
+        return { names, last: typeof r.last === 'string' ? r.last : null };
       }
     }
   } catch {
