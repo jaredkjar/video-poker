@@ -48,6 +48,7 @@ export function useProfiles() {
   const [stats, setStats] = useState(boot.data.stats);
   const [bjStats, setBjStats] = useState(boot.data.bjStats);
   const [rouletteStats, setRouletteStats] = useState(boot.data.rouletteStats);
+  const [rouletteHistory, setRouletteHistory] = useState(boot.data.rouletteHistory);
 
   useEffect(() => {
     if (!user || user === GUEST) return;
@@ -64,8 +65,9 @@ export function useProfiles() {
       stats,
       bjStats,
       rouletteStats,
+      rouletteHistory,
     });
-  }, [user, credits, bet, bjBet, soundOn, dollars, denom, trainer, theme, textSize, stats, bjStats, rouletteStats]);
+  }, [user, credits, bet, bjBet, soundOn, dollars, denom, trainer, theme, textSize, stats, bjStats, rouletteStats, rouletteHistory]);
 
   const applyProfile = (data: SaveData) => {
     setCredits(data.credits);
@@ -80,6 +82,7 @@ export function useProfiles() {
     setStats(data.stats);
     setBjStats(data.bjStats);
     setRouletteStats(data.rouletteStats);
+    setRouletteHistory(data.rouletteHistory);
   };
 
   /** Sign in, creating the profile if needed. Returns the canonical name, or null if blank. */
@@ -120,6 +123,7 @@ export function useProfiles() {
     setStats(emptyStats());
     setBjStats(emptyBjStats());
     setRouletteStats(emptyRouletteStats());
+    setRouletteHistory([]);
   };
 
   return {
@@ -150,6 +154,8 @@ export function useProfiles() {
     setBjStats,
     rouletteStats,
     setRouletteStats,
+    rouletteHistory,
+    setRouletteHistory,
     login,
     playAsGuest,
     signOut,

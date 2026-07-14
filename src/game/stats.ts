@@ -48,7 +48,11 @@ export interface SaveData {
   stats: Stats;
   bjStats: BlackjackStats;
   rouletteStats: RouletteStats;
+  /** Most recent roulette results, newest first (capped at HISTORY_MAX). */
+  rouletteHistory: number[];
 }
+
+export const HISTORY_MAX = 20;
 
 export interface Registry {
   names: string[];
@@ -120,7 +124,15 @@ export function defaultSave(): SaveData {
     stats: emptyStats(),
     bjStats: emptyBjStats(),
     rouletteStats: emptyRouletteStats(),
+    rouletteHistory: [],
   };
+}
+
+function normalizeHistory(h?: unknown): number[] {
+  if (!Array.isArray(h)) return [];
+  return h
+    .filter((n): n is number => typeof n === 'number' && Number.isInteger(n) && n >= 0 && n <= 36)
+    .slice(0, HISTORY_MAX);
 }
 
 export function loadRegistry(): Registry {
@@ -169,6 +181,7 @@ export function loadProfile(name: string): SaveData {
         stats: normalizeStats(p.stats),
         bjStats: normalizeGameStats(emptyBjStats(), p.bjStats),
         rouletteStats: normalizeGameStats(emptyRouletteStats(), p.rouletteStats),
+        rouletteHistory: normalizeHistory(p.rouletteHistory),
       };
     }
   } catch {

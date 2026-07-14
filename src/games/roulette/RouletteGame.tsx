@@ -1,4 +1,5 @@
 import { useRef, useState, type ReactNode } from 'react';
+import { HISTORY_MAX } from '../../game/stats';
 import * as sounds from '../../game/sounds';
 import { useCountUp } from '../../hooks/useCountUp';
 import type { Profiles } from '../../hooks/useProfiles';
@@ -21,14 +22,13 @@ interface Props {
 }
 
 export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
-  const { credits, setCredits, dollars } = profiles;
+  const { credits, setCredits, dollars, rouletteHistory, setRouletteHistory } = profiles;
 
   const [bets, setBets] = useState<Bets>({});
   const [chip, setChip] = useState(5);
   const [spinning, setSpinning] = useState(false);
   const [wheelTarget, setWheelTarget] = useState<number | null>(null);
   const [result, setResult] = useState<number | null>(null);
-  const [history, setHistory] = useState<number[]>([]);
   const [win, setWin] = useState(0);
   const [message, setMessage] = useState('Place your bets, then press SPIN');
   const [celebration, setCelebration] = useState<Celebration | null>(null);
@@ -133,7 +133,7 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
       setMessage(`${label} — no win this time`);
     }
 
-    setHistory((h) => [final, ...h].slice(0, 12));
+    setRouletteHistory((h) => [final, ...h].slice(0, HISTORY_MAX));
     lastBets.current = bets;
     setBets({});
     undoStack.current = [];
@@ -175,14 +175,19 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
 
       <div className="message-area">
         <div className={`message${win > 0 ? ' win' : ''}`}>{message || ' '}</div>
-        <div className="rl-history">
-          {history.length > 0 && <span className="rl-history-label">Last spins</span>}
-          {history.map((n, i) => (
-            <span key={i} className={`hist-chip ${colorOf(n)}`}>
+      </div>
+
+      <div className="rl-history" aria-label="Previous spins">
+        <span className="rl-history-label">Last spins</span>
+        {rouletteHistory.length === 0 ? (
+          <span className="rl-history-empty">no spins yet</span>
+        ) : (
+          rouletteHistory.map((n, i) => (
+            <span key={i} className={`hist-chip ${colorOf(n)}${i === 0 ? ' latest' : ''}`}>
               {n}
             </span>
-          ))}
-        </div>
+          ))
+        )}
       </div>
 
       <div className="rl-board">
