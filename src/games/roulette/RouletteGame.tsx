@@ -6,7 +6,7 @@ import type { Profiles } from '../../hooks/useProfiles';
 import { Marquee } from '../../components/Marquee';
 import { StatusBar } from '../../components/StatusBar';
 import { WinOverlay, type Celebration } from '../../components/WinOverlay';
-import { colorOf, resolveBets, spinWheel, type Bets } from './engine';
+import { colorOf, DOUBLE_ZERO, numberLabel, resolveBets, spinWheel, type Bets } from './engine';
 import { RouletteWheel, SPIN_MS } from './RouletteWheel';
 
 const CHIP_VALUES = [1, 5, 10, 25];
@@ -119,7 +119,7 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
       biggestWin: Math.max(s.biggestWin, returned),
     }));
 
-    const label = `${final} ${colorOf(final)}`;
+    const label = `${numberLabel(final)} ${colorOf(final)}`;
     if (returned > 0) {
       sounds.win(returned / staked >= 10 ? 25 : returned > staked ? 6 : 2);
       setMessage(`${label} — you win ${fmt(returned)}!`);
@@ -171,7 +171,7 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
     <main className="machine roulette">
       <div className="topbar">{topbar}</div>
 
-      <Marquee title="Roulette" tagline="European wheel · Single zero" />
+      <Marquee title="Roulette" tagline="American wheel · 0 and 00" />
 
       <div className="message-area">
         <div className={`message${win > 0 ? ' win' : ''}`}>{message || ' '}</div>
@@ -184,20 +184,29 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
         ) : (
           rouletteHistory.map((n, i) => (
             <span key={i} className={`hist-chip ${colorOf(n)}${i === 0 ? ' latest' : ''}`}>
-              {n}
+              {numberLabel(n)}
             </span>
           ))
         )}
       </div>
 
       <div className="rl-board">
-        <button
-          type="button"
-          className={`rb-cell rb-zero green${result === 0 ? ' hit' : ''}`}
-          onClick={() => placeBet('n0')}
-        >
-          0{chipOn('n0')}
-        </button>
+        <div className="rb-zeros">
+          <button
+            type="button"
+            className={`rb-cell rb-zero green${result === DOUBLE_ZERO ? ' hit' : ''}`}
+            onClick={() => placeBet(`n${DOUBLE_ZERO}`)}
+          >
+            00{chipOn(`n${DOUBLE_ZERO}`)}
+          </button>
+          <button
+            type="button"
+            className={`rb-cell rb-zero green${result === 0 ? ' hit' : ''}`}
+            onClick={() => placeBet('n0')}
+          >
+            0{chipOn('n0')}
+          </button>
+        </div>
         {/* Number grid: top row 3,6..36; middle 2,5..35; bottom 1,4..34 */}
         <div className="rb-nums">
           {[0, 1, 2].map((row) => (
@@ -306,8 +315,8 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
       />
 
       <p className="disclaimer">
-        For entertainment &amp; practice only — play money, no real wagering. European
-        single-zero wheel driven by a cryptographic RNG; straight-up pays 35:1, dozens and
+        For entertainment &amp; practice only — play money, no real wagering. American
+        double-zero wheel driven by a cryptographic RNG; straight-up pays 35:1, dozens and
         columns 2:1, even-money bets 1:1.
       </p>
 

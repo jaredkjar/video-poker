@@ -1547,9 +1547,16 @@ button {
   border-color: #348a5f;
 }
 
-.rb-zero {
+.rb-zeros {
   grid-area: zero;
-  font-size: calc(clamp(14px, 2vw, 18px) * var(--ts));
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rb-zero {
+  flex: 1;
+  font-size: calc(clamp(13px, 1.9vw, 17px) * var(--ts));
 }
 
 .rb-out {
@@ -2507,6 +2514,7 @@ button {
   .rl-board,
   .rb-nums,
   .rb-numrow,
+  .rb-zeros,
   .rb-colbets,
   .rb-dozens,
   .rb-evens {

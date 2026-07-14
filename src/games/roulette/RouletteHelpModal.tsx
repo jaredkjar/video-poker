@@ -10,7 +10,7 @@ export function RouletteHelpModal({ onClose }: Props) {
           ✕
         </button>
         <h2>How to Play</h2>
-        <p className="modal-sub">European roulette — one zero, 37 pockets</p>
+        <p className="modal-sub">American roulette — 0 and 00, 38 pockets</p>
 
         <h3>A spin</h3>
         <ol className="howto-steps">
@@ -19,8 +19,8 @@ export function RouletteHelpModal({ onClose }: Props) {
             numbers, colors, dozens, columns. Stack as many bets as you like.
           </li>
           <li>
-            Press <strong>SPIN</strong>. The ball lands on 0–36 and every bet covering that
-            number pays out.
+            Press <strong>SPIN</strong>. The ball lands in one of 38 pockets (0, 00, and 1–36)
+            and every bet covering that number pays out.
           </li>
           <li>
             <strong>Rebet</strong> puts your previous bets back on the board with one click.
@@ -31,7 +31,7 @@ export function RouletteHelpModal({ onClose }: Props) {
         <div className="howto-hands">
           <div className="howto-hand">
             <span className="hh-name">Straight up</span>
-            <span className="hh-desc">A single number, including 0</span>
+            <span className="hh-desc">A single number, including 0 and 00</span>
             <span className="hh-pays">pays 35:1</span>
           </div>
           <div className="howto-hand">
@@ -46,8 +46,8 @@ export function RouletteHelpModal({ onClose }: Props) {
           </div>
         </div>
         <p className="howto-note">
-          Zero is green and beats every outside bet — that's the whole house edge (2.7%). Each
-          spin comes from a cryptographic RNG; every pocket is exactly equally likely.
+          The green 0 and 00 beat every outside bet — that's the whole house edge (5.26%).
+          Each spin comes from a cryptographic RNG; every pocket is exactly equally likely.
         </p>
 
         <button type="button" className="modal-link howto-link" onClick={onClose}>

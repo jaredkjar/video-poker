@@ -45,7 +45,7 @@ const GAMES: GameTile[] = [
   {
     id: 'roulette',
     name: 'Roulette',
-    blurb: 'European wheel · straight-up pays 35:1',
+    blurb: 'American wheel · straight-up pays 35:1',
     visual: (
       <span className="tile-wheel" aria-hidden="true">
         <span className="tile-wheel-hub" />

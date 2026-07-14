@@ -130,8 +130,9 @@ export function defaultSave(): SaveData {
 
 function normalizeHistory(h?: unknown): number[] {
   if (!Array.isArray(h)) return [];
+  // 0..36 plus 37, the internal encoding for 00
   return h
-    .filter((n): n is number => typeof n === 'number' && Number.isInteger(n) && n >= 0 && n <= 36)
+    .filter((n): n is number => typeof n === 'number' && Number.isInteger(n) && n >= 0 && n <= 37)
     .slice(0, HISTORY_MAX);
 }
 

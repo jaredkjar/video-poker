@@ -1,4 +1,9 @@
-// European (single-zero) roulette: bet resolution and the wheel RNG.
+// American (double-zero) roulette: bet resolution and the wheel RNG.
+
+/** 00 is stored internally as 37 — use numberLabel() anywhere it's shown. */
+export const DOUBLE_ZERO = 37;
+
+export const numberLabel = (n: number) => (n === DOUBLE_ZERO ? '00' : String(n));
 
 export const RED_NUMBERS = new Set([
   1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36,
@@ -7,18 +12,19 @@ export const RED_NUMBERS = new Set([
 export type RouletteColor = 'red' | 'black' | 'green';
 
 export const colorOf = (n: number): RouletteColor =>
-  n === 0 ? 'green' : RED_NUMBERS.has(n) ? 'red' : 'black';
+  n === 0 || n === DOUBLE_ZERO ? 'green' : RED_NUMBERS.has(n) ? 'red' : 'black';
 
 /**
- * Bet ids: `n0`..`n36` straight up, `red`/`black`, `even`/`odd`, `low`(1-18)/
- * `high`(19-36), `d1`/`d2`/`d3` dozens, `c1`/`c2`/`c3` columns (c1 = 1,4,…34).
+ * Bet ids: `n0`..`n37` straight up (n37 = 00), `red`/`black`, `even`/`odd`,
+ * `low`(1-18)/`high`(19-36), `d1`/`d2`/`d3` dozens, `c1`/`c2`/`c3` columns
+ * (c1 = 1,4,…34).
  */
 export type BetId = string;
 
 /** Credits returned per credit staked on `id` when `n` hits (0 = bet lost, stake included). */
 export function betReturn(id: BetId, n: number): number {
   if (id.startsWith('n')) return Number(id.slice(1)) === n ? 36 : 0;
-  if (n === 0) return 0; // zero beats every outside bet
+  if (n === 0 || n === DOUBLE_ZERO) return 0; // the zeros beat every outside bet
   switch (id) {
     case 'red':
       return RED_NUMBERS.has(n) ? 2 : 0;
@@ -58,14 +64,14 @@ export function resolveBets(bets: Bets, n: number): number {
   return returned;
 }
 
-/** Uniform 0..36 from the cryptographic RNG (rejection sampling avoids modulo bias). */
+/** Uniform over all 38 pockets (0..36 plus 37 = 00), rejection-sampled to avoid modulo bias. */
 export function spinWheel(): number {
   const buf = new Uint32Array(1);
-  const limit = Math.floor(0x100000000 / 37) * 37;
+  const limit = Math.floor(0x100000000 / 38) * 38;
   let r: number;
   do {
     crypto.getRandomValues(buf);
     r = buf[0];
   } while (r >= limit);
-  return r % 37;
+  return r % 38;
 }

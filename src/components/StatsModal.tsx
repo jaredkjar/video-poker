@@ -99,8 +99,8 @@ export function StatsModal({ user, stats, bjStats, rouletteStats, format, onRese
         <p className="odds-note">
           Every game runs on a cryptographic RNG with true casino odds: 9/6 Jacks or Better
           returns 99.54% with perfect strategy, single-deck blackjack roughly 99.7% with basic
-          strategy, and European roulette 97.3%. For entertainment and practice only; play money
-          has no cash value.
+          strategy, and double-zero roulette 94.74%. For entertainment and practice only; play
+          money has no cash value.
         </p>
 
         <button type="button" className="modal-link" onClick={onReset}>
