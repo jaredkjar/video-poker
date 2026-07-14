@@ -1378,6 +1378,33 @@ button {
 
 /* ---------- Blackjack table ---------- */
 
+/*
+ * Blackjack and roulette bets can grow to many digits, so their consoles
+ * always stack: displays on one row, actions below. Otherwise a widening
+ * BET display reflows the buttons onto a new row mid-round.
+ */
+.machine.blackjack .console,
+.machine.roulette .console {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.machine.blackjack .displays,
+.machine.roulette .displays {
+  justify-content: center;
+}
+
+.machine.blackjack .display,
+.machine.roulette .display {
+  flex: 1;
+  min-width: 0;
+}
+
+.machine.blackjack .buttons,
+.machine.roulette .buttons {
+  justify-content: center;
+}
+
 .bj-table {
   display: flex;
   flex-direction: column;
