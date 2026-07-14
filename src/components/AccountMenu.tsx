@@ -6,7 +6,8 @@ interface Props {
   isGuest: boolean;
   statsSummary?: string;
   onStats: () => void;
-  onHowTo: () => void;
+  /** Game-specific help — omit on screens with no game (the lobby). */
+  onHowTo?: () => void;
   onFeedback: () => void;
   onSignOut: () => void;
 }
@@ -52,9 +53,11 @@ export function AccountMenu({
             <button type="button" role="menuitem" onClick={run(onStats)}>
               Statistics
             </button>
-            <button type="button" role="menuitem" onClick={run(onHowTo)}>
-              How to play
-            </button>
+            {onHowTo && (
+              <button type="button" role="menuitem" onClick={run(onHowTo)}>
+                How to play
+              </button>
+            )}
             <button type="button" role="menuitem" onClick={run(onFeedback)}>
               Send feedback
             </button>

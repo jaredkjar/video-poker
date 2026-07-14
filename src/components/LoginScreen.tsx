@@ -45,7 +45,6 @@ interface Props {
   onGuest: () => void;
   onDelete: (name: string) => void;
   onSettings: () => void;
-  onHowTo: () => void;
 }
 
 const FAN_CARDS = [
@@ -65,7 +64,7 @@ function GearIcon() {
   );
 }
 
-export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings, onHowTo }: Props) {
+export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings }: Props) {
   const [name, setName] = useState('');
   const visits = useVisitCount();
   const trimmed = name.trim();
@@ -85,7 +84,7 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings, onH
         <GearIcon />
       </button>
 
-      <Marquee />
+      <Marquee tagline="Video Poker · Blackjack · Roulette" />
 
       <div className="fan" aria-hidden="true">
         {FAN_CARDS.map((c) => (
@@ -191,10 +190,6 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings, onH
           Play as Guest
         </button>
         <p className="guest-note">Guest credits and stats aren't saved.</p>
-
-        <button type="button" className="modal-link howto-link" onClick={onHowTo}>
-          New to video poker? How to play
-        </button>
 
         <p className="login-foot">
           For entertainment &amp; practice only — play money, no cash value.

@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
 import { HAND_NAMES } from '../game/cards';
-import type { Stats } from '../game/stats';
+import type { BlackjackStats, RouletteStats, Stats } from '../game/stats';
 
 interface Props {
   user: string;
   stats: Stats;
+  bjStats: BlackjackStats;
+  rouletteStats: RouletteStats;
   format: (amount: number) => string;
   onReset: () => void;
   onClose: () => void;
@@ -21,7 +23,7 @@ function Row({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
-export function StatsModal({ user, stats, format, onReset, onClose }: Props) {
+export function StatsModal({ user, stats, bjStats, rouletteStats, format, onReset, onClose }: Props) {
   return (
     <div className="backdrop" onClick={onClose}>
       <div className="modal stats-modal" onClick={(e) => e.stopPropagation()}>
@@ -32,7 +34,7 @@ export function StatsModal({ user, stats, format, onReset, onClose }: Props) {
 
         <div className="stats-columns">
           <div>
-            <h3>Session</h3>
+            <h3>Video Poker</h3>
             <div className="stat-section">
               <Row label="Hands played" value={stats.hands} />
               <Row
@@ -56,12 +58,49 @@ export function StatsModal({ user, stats, format, onReset, onClose }: Props) {
               ))}
             </div>
           </div>
+          <div>
+            <h3>Blackjack</h3>
+            <div className="stat-section">
+              <Row label="Hands played" value={bjStats.hands} />
+              <Row
+                label="Hands won"
+                value={
+                  bjStats.hands > 0 ? `${bjStats.wins} (${pct(bjStats.wins, bjStats.hands)})` : 0
+                }
+              />
+              <Row label="Pushes" value={bjStats.pushes} />
+              <Row label="Blackjacks" value={bjStats.blackjacks} />
+              <Row label="Total wagered" value={format(bjStats.wagered)} />
+              <Row label="Total won" value={format(bjStats.won)} />
+              <Row label="Return" value={pct(bjStats.won, bjStats.wagered)} />
+              <Row label="Biggest win" value={format(bjStats.biggestWin)} />
+            </div>
+          </div>
+          <div>
+            <h3>Roulette</h3>
+            <div className="stat-section">
+              <Row label="Spins" value={rouletteStats.spins} />
+              <Row
+                label="Winning spins"
+                value={
+                  rouletteStats.spins > 0
+                    ? `${rouletteStats.wins} (${pct(rouletteStats.wins, rouletteStats.spins)})`
+                    : 0
+                }
+              />
+              <Row label="Total wagered" value={format(rouletteStats.wagered)} />
+              <Row label="Total won" value={format(rouletteStats.won)} />
+              <Row label="Return" value={pct(rouletteStats.won, rouletteStats.wagered)} />
+              <Row label="Biggest win" value={format(rouletteStats.biggestWin)} />
+            </div>
+          </div>
         </div>
 
         <p className="odds-note">
-          Every hand is dealt from a full 52-card deck shuffled with a cryptographic RNG — the
-          same odds as a real full-pay 9/6 Jacks or Better machine, which returns 99.54% with
-          perfect strategy. For entertainment and practice only; play money has no cash value.
+          Every game runs on a cryptographic RNG with true casino odds: 9/6 Jacks or Better
+          returns 99.54% with perfect strategy, single-deck blackjack roughly 99.7% with basic
+          strategy, and European roulette 97.3%. For entertainment and practice only; play money
+          has no cash value.
         </p>
 
         <button type="button" className="modal-link" onClick={onReset}>

@@ -17,6 +17,25 @@ export function GearIcon() {
   );
 }
 
+export function BackIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="19"
+      height="19"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </svg>
+  );
+}
+
 export function ChevronDownIcon() {
   return (
     <svg

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import {
   defaultSave,
   deleteProfileData,
+  emptyBjStats,
+  emptyRouletteStats,
   emptyStats,
   loadProfile,
   loadRegistry,
@@ -11,6 +13,9 @@ import {
 } from '../game/stats';
 
 export const GUEST = '__guest__';
+
+/** Everything a signed-in session exposes — game screens receive this whole bundle. */
+export type Profiles = ReturnType<typeof useProfiles>;
 
 /**
  * Player profiles: who is signed in, their persisted bankroll/settings/stats,
@@ -33,6 +38,7 @@ export function useProfiles() {
 
   const [credits, setCredits] = useState(boot.data.credits);
   const [bet, setBet] = useState(boot.data.bet);
+  const [bjBet, setBjBet] = useState(boot.data.bjBet);
   const [soundOn, setSoundOn] = useState(boot.data.sound);
   const [dollars, setDollars] = useState(boot.data.dollars);
   const [denom, setDenom] = useState(boot.data.denom);
@@ -40,12 +46,15 @@ export function useProfiles() {
   const [theme, setTheme] = useState(boot.data.theme);
   const [textSize, setTextSize] = useState(boot.data.textSize);
   const [stats, setStats] = useState(boot.data.stats);
+  const [bjStats, setBjStats] = useState(boot.data.bjStats);
+  const [rouletteStats, setRouletteStats] = useState(boot.data.rouletteStats);
 
   useEffect(() => {
     if (!user || user === GUEST) return;
     saveProfile(user, {
       credits,
       bet,
+      bjBet,
       sound: soundOn,
       dollars,
       denom,
@@ -53,12 +62,15 @@ export function useProfiles() {
       theme,
       textSize,
       stats,
+      bjStats,
+      rouletteStats,
     });
-  }, [user, credits, bet, soundOn, dollars, denom, trainer, theme, textSize, stats]);
+  }, [user, credits, bet, bjBet, soundOn, dollars, denom, trainer, theme, textSize, stats, bjStats, rouletteStats]);
 
   const applyProfile = (data: SaveData) => {
     setCredits(data.credits);
     setBet(data.bet);
+    setBjBet(data.bjBet);
     setSoundOn(data.sound);
     setDollars(data.dollars);
     setDenom(data.denom);
@@ -66,6 +78,8 @@ export function useProfiles() {
     setTheme(data.theme);
     setTextSize(data.textSize);
     setStats(data.stats);
+    setBjStats(data.bjStats);
+    setRouletteStats(data.rouletteStats);
   };
 
   /** Sign in, creating the profile if needed. Returns the canonical name, or null if blank. */
@@ -102,7 +116,11 @@ export function useProfiles() {
     saveRegistry({ names, last: null });
   };
 
-  const resetStats = () => setStats(emptyStats());
+  const resetStats = () => {
+    setStats(emptyStats());
+    setBjStats(emptyBjStats());
+    setRouletteStats(emptyRouletteStats());
+  };
 
   return {
     user,
@@ -112,6 +130,8 @@ export function useProfiles() {
     setCredits,
     bet,
     setBet,
+    bjBet,
+    setBjBet,
     soundOn,
     setSoundOn,
     dollars,
@@ -126,6 +146,10 @@ export function useProfiles() {
     setTextSize,
     stats,
     setStats,
+    bjStats,
+    setBjStats,
+    rouletteStats,
+    setRouletteStats,
     login,
     playAsGuest,
     signOut,
