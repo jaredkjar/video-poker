@@ -1,4 +1,5 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { chipLabel, chipValues } from '../../game/chips';
 import { HISTORY_MAX } from '../../game/stats';
 import * as sounds from '../../game/sounds';
 import { useCountUp } from '../../hooks/useCountUp';
@@ -9,7 +10,6 @@ import { WinOverlay, type Celebration } from '../../components/WinOverlay';
 import { colorOf, DOUBLE_ZERO, numberLabel, resolveBets, spinWheel, type Bets } from './engine';
 import { RouletteWheel, SPIN_MS } from './RouletteWheel';
 
-const CHIP_VALUES = [1, 5, 10, 25];
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 const sumBets = (bets: Bets) => Object.values(bets).reduce((a, b) => a + b, 0);
@@ -22,10 +22,17 @@ interface Props {
 }
 
 export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
-  const { credits, setCredits, dollars, rouletteHistory, setRouletteHistory } = profiles;
+  const { credits, setCredits, dollars, denom, rouletteHistory, setRouletteHistory } = profiles;
 
   const [bets, setBets] = useState<Bets>({});
   const [chip, setChip] = useState(5);
+
+  // Chip increments follow the display mode; when the set changes under a
+  // selected chip, fall back to the second-smallest (the "$1-ish" chip).
+  const chipSet = chipValues(dollars, denom);
+  useEffect(() => {
+    setChip((c) => (chipValues(dollars, denom).includes(c) ? c : chipValues(dollars, denom)[1]));
+  }, [dollars, denom]);
   const [spinning, setSpinning] = useState(false);
   const [wheelTarget, setWheelTarget] = useState<number | null>(null);
   const [result, setResult] = useState<number | null>(null);
@@ -141,7 +148,7 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
   };
 
   const chipOn = (id: string) =>
-    bets[id] ? <span className="rb-chip">{bets[id]}</span> : null;
+    bets[id] ? <span className="rb-chip">{chipLabel(bets[id], dollars, denom)}</span> : null;
 
   const numCell = (n: number) => (
     <button
@@ -268,18 +275,18 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
 
         <div className="buttons rl-actions">
           <div className="chip-row" role="radiogroup" aria-label="Chip value">
-            {CHIP_VALUES.map((v) => (
+            {chipSet.map((v) => (
               <button
                 key={v}
                 type="button"
-                className={`chip-btn${chip === v ? ' selected' : ''}${dollars ? ' small' : ''}`}
+                className={`chip-btn${chip === v ? ' selected' : ''}`}
                 aria-pressed={chip === v}
                 onClick={() => {
                   setChip(v);
                   sounds.blip();
                 }}
               >
-                {fmt(v)}
+                {chipLabel(v, dollars, denom)}
               </button>
             ))}
           </div>

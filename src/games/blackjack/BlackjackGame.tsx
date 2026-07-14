@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { chipLabel, chipValues } from '../../game/chips';
 import { newDeck, type Card } from '../../game/cards';
 import * as sounds from '../../game/sounds';
 import { useCountUp } from '../../hooks/useCountUp';
@@ -8,7 +9,6 @@ import { CardView } from '../../components/CardView';
 import { StatusBar } from '../../components/StatusBar';
 import { handValue, isBlackjack, settle, valueLabel, type Settlement } from './engine';
 
-const CHIP_VALUES = [1, 5, 10, 25];
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 type Phase = 'betting' | 'player' | 'dealer' | 'done';
@@ -31,7 +31,8 @@ export function BlackjackGame({
   onAddCredits,
   onRoundLive,
 }: Props) {
-  const { credits, setCredits, bjBet, setBjBet, dollars } = profiles;
+  const { credits, setCredits, bjBet, setBjBet, dollars, denom } = profiles;
+  const chipSet = chipValues(dollars, denom);
 
   const [playerCards, setPlayerCards] = useState<Card[]>([]);
   const [dealerCards, setDealerCards] = useState<Card[]>([]);
@@ -319,9 +320,9 @@ export function BlackjackGame({
 
         {betting ? (
           <div className="buttons">
-            {CHIP_VALUES.map((v) => (
+            {chipSet.map((v) => (
               <button key={v} type="button" disabled={busy} onClick={() => addChip(v)}>
-                +{fmt(v)}
+                +{chipLabel(v, dollars, denom)}
               </button>
             ))}
             <button type="button" disabled={busy || bjBet === 0} onClick={clearBet}>
