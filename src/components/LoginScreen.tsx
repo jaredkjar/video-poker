@@ -55,6 +55,23 @@ const FAN_CARDS = [
   { label: 'A', rot: 32 },
 ];
 
+const TAGLINES = [
+  'Video Poker · Blackjack · Roulette',
+  '9/6 Full-Pay Poker · Exact-EV Trainer',
+  'Blackjack Pays 3:2',
+  'Straight-Up Pays 35:1',
+];
+
+/** Cycle through the casino's selling points every few seconds. */
+function useRotatingTagline(): string {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % TAGLINES.length), 4000);
+    return () => clearInterval(id);
+  }, []);
+  return TAGLINES[index];
+}
+
 function GearIcon() {
   return (
     <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -67,6 +84,7 @@ function GearIcon() {
 export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings }: Props) {
   const [name, setName] = useState('');
   const visits = useVisitCount();
+  const tagline = useRotatingTagline();
   const trimmed = name.trim();
   const existing = trimmed
     ? users.find((u) => u.name.toLowerCase() === trimmed.toLowerCase())
@@ -90,15 +108,15 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings }: P
             Lucky Jack's <em>Casino</em>
           </>
         }
-        tagline="Video Poker · Blackjack · Roulette"
+        tagline={tagline}
       />
 
       <div className="fan" aria-hidden="true">
-        {FAN_CARDS.map((c) => (
+        {FAN_CARDS.map((c, i) => (
           <div
             key={c.label}
             className="fan-card"
-            style={{ '--rot': `${c.rot}deg` } as CSSProperties}
+            style={{ '--rot': `${c.rot}deg`, '--i': i } as CSSProperties}
           >
             <div className="fc-corner">
               <span>{c.label}</span>

@@ -114,6 +114,20 @@ button {
   border-radius: 16px;
   padding: clamp(16px, 3vw, 30px);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  animation: screenIn 0.3s ease backwards;
+}
+
+@keyframes screenIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Screen swaps crossfade via the View Transitions API (see App.tsx) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.25s;
 }
 
 /* ---------- Top bar (settings + account) ---------- */
@@ -367,6 +381,44 @@ button {
   letter-spacing: 0.08em;
   text-transform: lowercase;
   color: var(--gold-dim);
+}
+
+/* One-time light sweep across the title, like light catching a sign */
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .marquee h1 {
+    background: linear-gradient(105deg, var(--gold) 42%, #ffe9b3 50%, var(--gold) 58%);
+    background-size: 300% 100%;
+    background-position: 100% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: marqueeShimmer 1.6s ease-out 0.45s 1;
+  }
+
+  /* the small "casino" keeps its dimmer gold, outside the shimmer */
+  .marquee h1 em {
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
+@keyframes marqueeShimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+.marquee .tagline {
+  animation: tagIn 0.45s ease backwards;
+}
+
+@keyframes tagIn {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
 }
 
 .marquee .tagline {
@@ -905,6 +957,21 @@ button {
   height: 124px;
   /* the fanned side cards' tips reach below the container — pad for them */
   margin: 22px auto 30px;
+  /* gentle idle sway once the deal-in has finished */
+  animation: fanSway 8s ease-in-out 1.6s infinite;
+}
+
+@keyframes fanSway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-0.7deg);
+  }
+  75% {
+    transform: rotate(0.7deg);
+  }
 }
 
 .fan-card {
@@ -921,6 +988,16 @@ button {
   box-shadow:
     -3px 3px 8px rgba(0, 0, 0, 0.3),
     inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+  /* cards start stacked and fan out one after another */
+  animation: fanOut 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) backwards;
+  animation-delay: calc(150ms + var(--i, 0) * 70ms);
+}
+
+@keyframes fanOut {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) rotate(0deg) translateY(10px);
+  }
 }
 
 .fc-corner {
@@ -1246,6 +1323,22 @@ button {
   padding: clamp(16px, 3vw, 24px) 14px 18px;
   cursor: pointer;
   transition: border-color 0.12s ease, background 0.12s ease, transform 0.12s ease;
+  animation: tileIn 0.35s ease backwards;
+}
+
+.game-tile:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.game-tile:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+@keyframes tileIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
 
 .game-tile:hover {
@@ -2751,5 +2844,23 @@ button {
     max-height: 92vh;
     max-height: 92dvh;
     overflow-y: auto;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .machine,
+  .game-tile,
+  .fan,
+  .fan-card,
+  .marquee h1,
+  .marquee .tagline {
+    animation: none;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
   }
 }

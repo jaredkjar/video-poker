@@ -16,7 +16,10 @@ export function Marquee({ title, tagline }: Props) {
           </>
         )}
       </h1>
-      <div className="tagline">{tagline}</div>
+      {/* keyed so a rotating tagline replays its fade-in on each swap */}
+      <div className="tagline" key={tagline}>
+        {tagline}
+      </div>
       <div className="byline">Developed by Jared Kjar</div>
     </header>
   );

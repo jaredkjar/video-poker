@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { savePrefs } from './game/prefs';
 import { defaultSave, loadProfile } from './game/stats';
 import * as sounds from './game/sounds';
@@ -18,6 +19,19 @@ import { BlackjackGame } from './games/blackjack/BlackjackGame';
 import { BlackjackHelpModal } from './games/blackjack/BlackjackHelpModal';
 import { RouletteGame } from './games/roulette/RouletteGame';
 import { RouletteHelpModal } from './games/roulette/RouletteHelpModal';
+
+/**
+ * Run a screen swap inside a View Transition crossfade where the browser
+ * supports it (Chrome/Edge/Safari); everywhere else it's an instant swap.
+ * flushSync makes React commit the new screen inside the transition callback.
+ */
+function transition(update: () => void) {
+  if (document.startViewTransition) {
+    document.startViewTransition(() => flushSync(update));
+  } else {
+    update();
+  }
+}
 
 export default function App() {
   const profiles = useProfiles();
@@ -71,20 +85,25 @@ export default function App() {
     confirmReq !== null;
 
   const handleLogin = (name: string) => {
-    if (!profiles.login(name)) return;
-    setGame(null);
+    transition(() => {
+      if (profiles.login(name)) setGame(null);
+    });
   };
 
   const handleGuest = () => {
-    profiles.playAsGuest();
-    setGame(null);
+    transition(() => {
+      profiles.playAsGuest();
+      setGame(null);
+    });
   };
 
   const handleSignOut = () => {
-    profiles.signOut();
-    setGame(null);
-    setStatsOpen(false);
-    setCreditsOpen(false);
+    transition(() => {
+      profiles.signOut();
+      setGame(null);
+      setStatsOpen(false);
+      setCreditsOpen(false);
+    });
   };
 
   /** Run `action` immediately, or confirm first when a wager would be forfeited. */
@@ -219,7 +238,7 @@ export default function App() {
             className="icon-btn"
             title="Back to games"
             aria-label="Back to games"
-            onClick={() => guardRound('Leave the table?', () => setGame(null))}
+            onClick={() => guardRound('Leave the table?', () => transition(() => setGame(null)))}
           >
             <BackIcon />
           </button>
@@ -256,7 +275,7 @@ export default function App() {
           balanceLabel={fmt(credits)}
           dollars={dollars}
           onToggleDollars={() => profiles.setDollars((d) => !d)}
-          onPick={setGame}
+          onPick={(g) => transition(() => setGame(g))}
           onAddCredits={openCredits}
         />
       )}
