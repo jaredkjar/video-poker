@@ -21,6 +21,11 @@ blackjack pays 3:2, double down on any first two cards.
 high/low, dozen, and column bets. An animated wheel (authentic pocket order)
 spins every result, and the table keeps a persistent last-spins history.
 
+**Ultimate Texas Hold'em** — heads-up hold'em against the dealer with the
+real betting structure: raise 3×/4× preflop, 2× on the flop, or bet 1× / fold
+at the river. Blind pays up to 500:1, optional Trips side bet, and a
+best-five-of-seven evaluator with full kicker-level tiebreakers.
+
 ## Shared across every game
 
 - Player profiles — everyone in the house gets their own bankroll, settings,
@@ -61,8 +66,8 @@ Layout:
 
 - `src/game/` — shared logic: cards, chips, profile persistence, sounds,
   and the poker hand evaluator / exact-EV strategy
-- `src/games/` — one folder per game: `poker/`, `blackjack/`, `roulette/`
-  (each with its own engine and table screen)
+- `src/games/` — one folder per game: `poker/`, `blackjack/`, `roulette/`,
+  `uth/` (each with its own engine and table screen)
 - `src/hooks/` — `useGameRound` (poker's deal → hold → draw machine),
   `useProfiles`, `useStrategyWorker`, and friends
 - `src/components/` — the lobby, login screen, cards, paytable, and modals
