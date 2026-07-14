@@ -199,7 +199,7 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings }: P
         <p className="guest-note">Guest credits and stats aren't saved.</p>
 
         <p className="login-foot">
-          For entertainment &amp; practice only — play money, no cash value.
+          For entertainment &amp; practice only — play money, no cash value. · v{__APP_VERSION__}
           {visits !== null && (
             <>
               {' '}
