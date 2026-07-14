@@ -254,6 +254,8 @@ export default function App() {
         <GameSelect
           topbar={topbar}
           balanceLabel={fmt(credits)}
+          dollars={dollars}
+          onToggleDollars={() => profiles.setDollars((d) => !d)}
           onPick={setGame}
           onAddCredits={openCredits}
         />

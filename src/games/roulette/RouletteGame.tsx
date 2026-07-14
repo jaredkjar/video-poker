@@ -258,14 +258,14 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
               <button
                 key={v}
                 type="button"
-                className={`chip-btn${chip === v ? ' selected' : ''}`}
+                className={`chip-btn${chip === v ? ' selected' : ''}${dollars ? ' small' : ''}`}
                 aria-pressed={chip === v}
                 onClick={() => {
                   setChip(v);
                   sounds.blip();
                 }}
               >
-                {v}
+                {fmt(v)}
               </button>
             ))}
           </div>

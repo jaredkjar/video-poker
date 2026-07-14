@@ -1671,8 +1671,19 @@ button {
   font: inherit;
   font-size: calc(14px * var(--ts));
   font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+/* Dollar chip values ("$6.25") need a smaller face to fit the circle */
+.chip-btn.small {
+  font-size: calc(11px * var(--ts));
+  letter-spacing: -0.01em;
 }
 
 .chip-btn:hover {

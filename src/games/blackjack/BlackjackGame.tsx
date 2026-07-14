@@ -321,7 +321,7 @@ export function BlackjackGame({
           <div className="buttons">
             {CHIP_VALUES.map((v) => (
               <button key={v} type="button" disabled={busy} onClick={() => addChip(v)}>
-                +{v}
+                +{fmt(v)}
               </button>
             ))}
             <button type="button" disabled={busy || bjBet === 0} onClick={clearBet}>

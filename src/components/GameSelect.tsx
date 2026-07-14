@@ -58,12 +58,21 @@ interface Props {
   /** Topbar contents (settings, account menu) supplied by the shell. */
   topbar: ReactNode;
   balanceLabel: string;
+  dollars: boolean;
+  onToggleDollars: () => void;
   onPick: (game: GameId) => void;
   onAddCredits: () => void;
 }
 
 /** The casino floor: pick a game to play. Shown right after choosing a profile. */
-export function GameSelect({ topbar, balanceLabel, onPick, onAddCredits }: Props) {
+export function GameSelect({
+  topbar,
+  balanceLabel,
+  dollars,
+  onToggleDollars,
+  onPick,
+  onAddCredits,
+}: Props) {
   return (
     <main className="machine lobby">
       <div className="topbar">{topbar}</div>
@@ -77,10 +86,22 @@ export function GameSelect({ topbar, balanceLabel, onPick, onAddCredits }: Props
         tagline="Video Poker · Blackjack · Roulette"
       />
 
-      <div className="display lobby-balance">
-        <label>Balance</label>
+      <div
+        className="display clickable lobby-balance"
+        title={dollars ? 'Show credits' : 'Show dollars'}
+        onClick={onToggleDollars}
+      >
+        <label>{dollars ? 'Balance' : 'Credits'}</label>
         <strong className="amber">{balanceLabel}</strong>
-        <button type="button" className="add-btn" title="Add credits" onClick={onAddCredits}>
+        <button
+          type="button"
+          className="add-btn"
+          title="Add credits"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddCredits();
+          }}
+        >
           +
         </button>
       </div>
