@@ -1305,7 +1305,8 @@ button {
 
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* 2x2 at the lobby's width; collapses to one column on phones below */
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 12px;
 }
 
@@ -1542,6 +1543,65 @@ button {
   border: 1px dashed var(--border-strong);
   border-radius: clamp(6px, 1.1vw, 9px);
   opacity: 0.5;
+}
+
+/* ---------- Ultimate Texas Hold'em ---------- */
+
+/* Nine cards share the table, so they run smaller than blackjack's */
+.uth-table .bj-cards .card-slot,
+.uth-table .bj-placeholder {
+  width: clamp(46px, 8.5vw, 74px);
+}
+
+.uth-bets {
+  display: flex;
+  justify-content: center;
+  gap: clamp(8px, 1.6vw, 14px);
+  margin: clamp(10px, 1.8vw, 16px) 0;
+}
+
+.uth-spot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: clamp(64px, 12vw, 84px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px dashed var(--border-strong);
+  background: var(--surface-2);
+  font: inherit;
+  padding: 0;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.uth-spot.active {
+  cursor: pointer;
+}
+
+.uth-spot.active:hover {
+  border-color: var(--gold-soft);
+  background: rgba(233, 189, 90, 0.05);
+}
+
+.uth-spot-label {
+  font-size: calc(10px * var(--ts));
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.uth-spot-amount {
+  font-size: calc(14px * var(--ts));
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+}
+
+.uth-spot-amount.filled {
+  color: var(--gold);
 }
 
 /* ---------- Roulette table ---------- */

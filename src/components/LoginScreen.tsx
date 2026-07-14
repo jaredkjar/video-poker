@@ -56,10 +56,11 @@ const FAN_CARDS = [
 ];
 
 const TAGLINES = [
-  'Video Poker · Blackjack · Roulette',
+  "Video Poker · Blackjack · Roulette · Hold'em",
   '9/6 Full-Pay Poker · Exact-EV Trainer',
   'Blackjack Pays 3:2',
   'Straight-Up Pays 35:1',
+  "Ultimate Hold'em · Blind Pays 500:1",
 ];
 
 /** Cycle through the casino's selling points every few seconds. */

@@ -5,6 +5,7 @@ import {
   emptyBjStats,
   emptyRouletteStats,
   emptyStats,
+  emptyUthStats,
   loadProfile,
   loadRegistry,
   saveProfile,
@@ -39,6 +40,8 @@ export function useProfiles() {
   const [credits, setCredits] = useState(boot.data.credits);
   const [bet, setBet] = useState(boot.data.bet);
   const [bjBet, setBjBet] = useState(boot.data.bjBet);
+  const [uthAnte, setUthAnte] = useState(boot.data.uthAnte);
+  const [uthTrips, setUthTrips] = useState(boot.data.uthTrips);
   const [soundOn, setSoundOn] = useState(boot.data.sound);
   const [dollars, setDollars] = useState(boot.data.dollars);
   const [denom, setDenom] = useState(boot.data.denom);
@@ -48,6 +51,7 @@ export function useProfiles() {
   const [stats, setStats] = useState(boot.data.stats);
   const [bjStats, setBjStats] = useState(boot.data.bjStats);
   const [rouletteStats, setRouletteStats] = useState(boot.data.rouletteStats);
+  const [uthStats, setUthStats] = useState(boot.data.uthStats);
   const [rouletteHistory, setRouletteHistory] = useState(boot.data.rouletteHistory);
 
   useEffect(() => {
@@ -56,6 +60,8 @@ export function useProfiles() {
       credits,
       bet,
       bjBet,
+      uthAnte,
+      uthTrips,
       sound: soundOn,
       dollars,
       denom,
@@ -65,14 +71,17 @@ export function useProfiles() {
       stats,
       bjStats,
       rouletteStats,
+      uthStats,
       rouletteHistory,
     });
-  }, [user, credits, bet, bjBet, soundOn, dollars, denom, trainer, theme, textSize, stats, bjStats, rouletteStats, rouletteHistory]);
+  }, [user, credits, bet, bjBet, uthAnte, uthTrips, soundOn, dollars, denom, trainer, theme, textSize, stats, bjStats, rouletteStats, uthStats, rouletteHistory]);
 
   const applyProfile = (data: SaveData) => {
     setCredits(data.credits);
     setBet(data.bet);
     setBjBet(data.bjBet);
+    setUthAnte(data.uthAnte);
+    setUthTrips(data.uthTrips);
     setSoundOn(data.sound);
     setDollars(data.dollars);
     setDenom(data.denom);
@@ -82,6 +91,7 @@ export function useProfiles() {
     setStats(data.stats);
     setBjStats(data.bjStats);
     setRouletteStats(data.rouletteStats);
+    setUthStats(data.uthStats);
     setRouletteHistory(data.rouletteHistory);
   };
 
@@ -123,6 +133,7 @@ export function useProfiles() {
     setStats(emptyStats());
     setBjStats(emptyBjStats());
     setRouletteStats(emptyRouletteStats());
+    setUthStats(emptyUthStats());
     setRouletteHistory([]);
   };
 
@@ -136,6 +147,10 @@ export function useProfiles() {
     setBet,
     bjBet,
     setBjBet,
+    uthAnte,
+    setUthAnte,
+    uthTrips,
+    setUthTrips,
     soundOn,
     setSoundOn,
     dollars,
@@ -154,6 +169,8 @@ export function useProfiles() {
     setBjStats,
     rouletteStats,
     setRouletteStats,
+    uthStats,
+    setUthStats,
     rouletteHistory,
     setRouletteHistory,
     login,

@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
 import { HAND_NAMES } from '../game/cards';
-import type { BlackjackStats, RouletteStats, Stats } from '../game/stats';
+import type { BlackjackStats, RouletteStats, Stats, UthStats } from '../game/stats';
 
 interface Props {
   user: string;
   stats: Stats;
   bjStats: BlackjackStats;
   rouletteStats: RouletteStats;
+  uthStats: UthStats;
   format: (amount: number) => string;
   onReset: () => void;
   onClose: () => void;
@@ -23,7 +24,16 @@ function Row({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
-export function StatsModal({ user, stats, bjStats, rouletteStats, format, onReset, onClose }: Props) {
+export function StatsModal({
+  user,
+  stats,
+  bjStats,
+  rouletteStats,
+  uthStats,
+  format,
+  onReset,
+  onClose,
+}: Props) {
   return (
     <div className="backdrop" onClick={onClose}>
       <div className="modal stats-modal" onClick={(e) => e.stopPropagation()}>
@@ -92,6 +102,26 @@ export function StatsModal({ user, stats, bjStats, rouletteStats, format, onRese
               <Row label="Total won" value={format(rouletteStats.won)} />
               <Row label="Return" value={pct(rouletteStats.won, rouletteStats.wagered)} />
               <Row label="Biggest win" value={format(rouletteStats.biggestWin)} />
+            </div>
+          </div>
+          <div>
+            <h3>Ultimate Hold'em</h3>
+            <div className="stat-section">
+              <Row label="Hands played" value={uthStats.hands} />
+              <Row
+                label="Hands won"
+                value={
+                  uthStats.hands > 0
+                    ? `${uthStats.wins} (${pct(uthStats.wins, uthStats.hands)})`
+                    : 0
+                }
+              />
+              <Row label="Pushes" value={uthStats.pushes} />
+              <Row label="Folds" value={uthStats.folds} />
+              <Row label="Total wagered" value={format(uthStats.wagered)} />
+              <Row label="Total won" value={format(uthStats.won)} />
+              <Row label="Return" value={pct(uthStats.won, uthStats.wagered)} />
+              <Row label="Biggest win" value={format(uthStats.biggestWin)} />
             </div>
           </div>
         </div>

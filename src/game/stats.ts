@@ -34,11 +34,25 @@ export interface RouletteStats {
   biggestWin: number;
 }
 
+export interface UthStats {
+  hands: number;
+  wins: number;
+  pushes: number;
+  folds: number;
+  wagered: number;
+  won: number;
+  biggestWin: number;
+}
+
 export interface SaveData {
   credits: number;
   bet: number;
   /** Last blackjack wager, restored when the player returns to the table */
   bjBet: number;
+  /** Last Ultimate Texas Hold'em ante (the blind always matches it) */
+  uthAnte: number;
+  /** Last Ultimate Texas Hold'em trips side bet */
+  uthTrips: number;
   sound: boolean;
   dollars: boolean;
   denom: number;
@@ -48,6 +62,7 @@ export interface SaveData {
   stats: Stats;
   bjStats: BlackjackStats;
   rouletteStats: RouletteStats;
+  uthStats: UthStats;
   /** Most recent roulette results, newest first (capped at HISTORY_MAX). */
   rouletteHistory: number[];
 }
@@ -84,6 +99,10 @@ export function emptyRouletteStats(): RouletteStats {
   return { spins: 0, wins: 0, wagered: 0, won: 0, biggestWin: 0 };
 }
 
+export function emptyUthStats(): UthStats {
+  return { hands: 0, wins: 0, pushes: 0, folds: 0, wagered: 0, won: 0, biggestWin: 0 };
+}
+
 /** Fill in any missing numeric fields — profiles saved before a game existed lack its stats. */
 function normalizeGameStats<T extends object>(empty: T, s?: Partial<T>): T {
   if (!s) return empty;
@@ -115,6 +134,8 @@ export function defaultSave(): SaveData {
     credits: 200,
     bet: 1,
     bjBet: 5,
+    uthAnte: 5,
+    uthTrips: 0,
     sound: true,
     dollars: false,
     denom: 0.25,
@@ -124,6 +145,7 @@ export function defaultSave(): SaveData {
     stats: emptyStats(),
     bjStats: emptyBjStats(),
     rouletteStats: emptyRouletteStats(),
+    uthStats: emptyUthStats(),
     rouletteHistory: [],
   };
 }
@@ -182,6 +204,7 @@ export function loadProfile(name: string): SaveData {
         stats: normalizeStats(p.stats),
         bjStats: normalizeGameStats(emptyBjStats(), p.bjStats),
         rouletteStats: normalizeGameStats(emptyRouletteStats(), p.rouletteStats),
+        uthStats: normalizeGameStats(emptyUthStats(), p.uthStats),
         rouletteHistory: normalizeHistory(p.rouletteHistory),
       };
     }

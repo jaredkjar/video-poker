@@ -19,6 +19,8 @@ import { BlackjackGame } from './games/blackjack/BlackjackGame';
 import { BlackjackHelpModal } from './games/blackjack/BlackjackHelpModal';
 import { RouletteGame } from './games/roulette/RouletteGame';
 import { RouletteHelpModal } from './games/roulette/RouletteHelpModal';
+import { UthGame } from './games/uth/UthGame';
+import { UthHelpModal } from './games/uth/UthHelpModal';
 
 /**
  * Run a screen swap inside a View Transition crossfade where the browser
@@ -35,7 +37,7 @@ function transition(update: () => void) {
 
 export default function App() {
   const profiles = useProfiles();
-  const { credits, setCredits, dollars, denom, soundOn, stats, bjStats, rouletteStats } =
+  const { credits, setCredits, dollars, denom, soundOn, stats, bjStats, rouletteStats, uthStats } =
     profiles;
 
   // null = lobby (game select); shown only while signed in
@@ -198,6 +200,8 @@ export default function App() {
       <BlackjackHelpModal onClose={() => setHowToOpen(null)} />
     ) : howToOpen === 'roulette' ? (
       <RouletteHelpModal onClose={() => setHowToOpen(null)} />
+    ) : howToOpen === 'uth' ? (
+      <UthHelpModal onClose={() => setHowToOpen(null)} />
     ) : null;
 
   if (!profiles.user) {
@@ -226,7 +230,7 @@ export default function App() {
   }
 
   const userLabel = profiles.isGuest ? 'Guest' : profiles.user;
-  const totalPlays = stats.hands + bjStats.hands + rouletteStats.spins;
+  const totalPlays = stats.hands + bjStats.hands + rouletteStats.spins + uthStats.hands;
   const statsSummary = totalPlays > 0 ? `${totalPlays} plays · ${fmt(credits)} balance` : undefined;
 
   const topbar = (
@@ -309,6 +313,16 @@ export default function App() {
           onAddCredits={openCredits}
         />
       )}
+      {game === 'uth' && (
+        <UthGame
+          profiles={profiles}
+          topbar={topbar}
+          fmt={fmt}
+          onInsufficient={onInsufficient}
+          onAddCredits={openCredits}
+          onRoundLive={setRoundLive}
+        />
+      )}
 
       {creditsOpen && (
         <CreditsModal
@@ -335,6 +349,7 @@ export default function App() {
           stats={stats}
           bjStats={bjStats}
           rouletteStats={rouletteStats}
+          uthStats={uthStats}
           format={fmt}
           onReset={() => {
             profiles.resetStats();

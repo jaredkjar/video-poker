@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Marquee } from './Marquee';
 
-export type GameId = 'poker' | 'blackjack' | 'roulette';
+export type GameId = 'poker' | 'blackjack' | 'roulette' | 'uth';
 
 interface GameTile {
   id: GameId;
@@ -52,6 +52,22 @@ const GAMES: GameTile[] = [
       </span>
     ),
   },
+  {
+    id: 'uth',
+    name: "Ultimate Hold'em",
+    blurb: 'Heads-up Texas hold’em · blind pays up to 500:1',
+    visual: (
+      <span className="tile-cards" aria-hidden="true">
+        <span className="tile-card black">
+          Q<small>♠</small>
+        </span>
+        <span className="tile-card red">
+          Q<small>♥</small>
+        </span>
+        <span className="tile-badge">500:1</span>
+      </span>
+    ),
+  },
 ];
 
 interface Props {
@@ -83,7 +99,7 @@ export function GameSelect({
             Lucky Jack's <em>Casino</em>
           </>
         }
-        tagline="Video Poker · Blackjack · Roulette"
+        tagline="Video Poker · Blackjack · Roulette · Hold'em"
       />
 
       <div
