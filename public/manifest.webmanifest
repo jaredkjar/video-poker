@@ -1,7 +1,7 @@
 {
-  "name": "Jacks or Better — Video Poker",
-  "short_name": "Jacks or Better",
-  "description": "Full-pay 9/6 Jacks or Better video poker with an exact-EV trainer. Play money only.",
+  "name": "Lucky Jack's Casino",
+  "short_name": "Lucky Jack's",
+  "description": "Play-money casino: 9/6 video poker with an exact-EV trainer, blackjack, and European roulette.",
   "start_url": ".",
   "scope": ".",
   "display": "fullscreen",

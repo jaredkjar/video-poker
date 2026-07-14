@@ -1,21 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import { MAX_BET } from './game/cards';
 import { savePrefs } from './game/prefs';
 import { defaultSave, loadProfile } from './game/stats';
 import * as sounds from './game/sounds';
-import { useCountUp } from './hooks/useCountUp';
 import { useProfiles } from './hooks/useProfiles';
-import { useStrategyWorker } from './hooks/useStrategyWorker';
-import { useGameRound } from './hooks/useGameRound';
-import { useKeyboardControls } from './hooks/useKeyboardControls';
-import { Marquee } from './components/Marquee';
-import { CardView } from './components/CardView';
-import { Paytable } from './components/Paytable';
-import { Console } from './components/Console';
-import { StatusBar } from './components/StatusBar';
 import { AccountMenu } from './components/AccountMenu';
-import { WinOverlay } from './components/WinOverlay';
-import { GearIcon } from './components/icons';
+import { BackIcon, GearIcon } from './components/icons';
 import { CreditsModal } from './components/CreditsModal';
 import { LoginScreen, type ProfileSummary } from './components/LoginScreen';
 import { ConfirmModal } from './components/ConfirmModal';
@@ -23,17 +12,29 @@ import { HowToPlayModal } from './components/HowToPlayModal';
 import { StatsModal } from './components/StatsModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FeedbackModal } from './components/FeedbackModal';
+import { GameSelect, type GameId } from './components/GameSelect';
+import { PokerGame } from './games/poker/PokerGame';
+import { BlackjackGame } from './games/blackjack/BlackjackGame';
+import { BlackjackHelpModal } from './games/blackjack/BlackjackHelpModal';
+import { RouletteGame } from './games/roulette/RouletteGame';
+import { RouletteHelpModal } from './games/roulette/RouletteHelpModal';
 
 export default function App() {
   const profiles = useProfiles();
-  const { credits, setCredits, bet, setBet, dollars, denom, soundOn, stats, trainer } = profiles;
+  const { credits, setCredits, dollars, denom, soundOn, stats, bjStats, rouletteStats } =
+    profiles;
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalNote, setModalNote] = useState('');
+  // null = lobby (game select); shown only while signed in
+  const [game, setGame] = useState<GameId | null>(null);
+  // True while a wager is unresolved in the current game (reported by the game screens)
+  const [roundLive, setRoundLive] = useState(false);
+
+  const [creditsOpen, setCreditsOpen] = useState(false);
+  const [creditsNote, setCreditsNote] = useState('');
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [howToOpen, setHowToOpen] = useState(false);
+  const [howToOpen, setHowToOpen] = useState<GameId | null>(null);
   const [confirmReq, setConfirmReq] = useState<{
     title: string;
     message: string;
@@ -61,91 +62,62 @@ export default function App() {
     savePrefs({ theme: profiles.theme, textSize: profiles.textSize });
   }, [profiles.theme, profiles.textSize]);
 
-  const strategy = useStrategyWorker();
-
-  const game = useGameRound({
-    bet,
-    trainer,
-    strategy,
-    formatMoney: fmt,
-    formatEV: fmtEV,
-    tryDeduct: (amount) => {
-      if (credits < amount) return false;
-      setCredits((c) => c - amount);
-      return true;
-    },
-    addWinnings: (amount) => setCredits((c) => c + amount),
-    onInsufficient: (betAmount) => {
-      setModalNote(`You need ${creditsWord(betAmount)} to play this bet.`);
-      setModalOpen(true);
-    },
-    onHandComplete: ({ rank, amount, bet: wager, strategyKnown, wasOptimal }) =>
-      profiles.setStats((s) => ({
-        ...s,
-        hands: s.hands + 1,
-        handsWon: s.handsWon + (amount > 0 ? 1 : 0),
-        wagered: s.wagered + wager,
-        won: s.won + amount,
-        biggestWin: Math.max(s.biggestWin, amount),
-        perfectHolds: s.perfectHolds + (wasOptimal ? 1 : 0),
-        holdsEvaluated: s.holdsEvaluated + (strategyKnown ? 1 : 0),
-        handCounts:
-          rank >= 0 ? s.handCounts.map((c, i) => (i === rank ? c + 1 : c)) : s.handCounts,
-      })),
-  });
-
-  const creditsDisplay = useCountUp(credits);
-
-  const betOne = () => {
-    if (game.phase === 'holding' || game.busy) return;
-    setBet((b) => (b % MAX_BET) + 1);
-    sounds.blip();
-  };
-
-  const betMax = () => {
-    if (game.phase === 'holding' || game.busy) return;
-    setBet(MAX_BET);
-    void game.deal(MAX_BET);
-  };
-
-  const dealOrDraw = () => (game.phase === 'holding' ? void game.draw() : void game.deal(bet));
-
-  useKeyboardControls({
-    active:
-      !!profiles.user &&
-      !modalOpen &&
-      !statsOpen &&
-      !settingsOpen &&
-      !feedbackOpen &&
-      !howToOpen &&
-      !confirmReq,
-    onHold: game.toggleHold,
-    onPrimary: dealOrDraw,
-    onHint: game.showHint,
-  });
+  const anyModalOpen =
+    creditsOpen ||
+    statsOpen ||
+    settingsOpen ||
+    feedbackOpen ||
+    howToOpen !== null ||
+    confirmReq !== null;
 
   const handleLogin = (name: string) => {
-    const finalName = profiles.login(name);
-    if (!finalName) return;
-    game.resetRound(`Welcome, ${finalName} — press DEAL to play`);
+    if (!profiles.login(name)) return;
+    setGame(null);
   };
 
   const handleGuest = () => {
     profiles.playAsGuest();
-    game.resetRound('Guest mode — press DEAL to play');
+    setGame(null);
   };
 
   const handleSignOut = () => {
     profiles.signOut();
+    setGame(null);
     setStatsOpen(false);
-    setModalOpen(false);
+    setCreditsOpen(false);
+  };
+
+  /** Run `action` immediately, or confirm first when a wager would be forfeited. */
+  const guardRound = (title: string, action: () => void) => {
+    if (!roundLive) {
+      action();
+      return;
+    }
+    setConfirmReq({
+      title,
+      message: 'You have a hand in play — leaving now forfeits your bet.',
+      confirmLabel: 'Leave anyway',
+      action: () => {
+        setRoundLive(false);
+        action();
+      },
+    });
+  };
+
+  const openCredits = () => {
+    setCreditsNote('');
+    setCreditsOpen(true);
+  };
+
+  const onInsufficient = (betAmount: number) => {
+    setCreditsNote(`You need ${creditsWord(betAmount)} to play this bet.`);
+    setCreditsOpen(true);
   };
 
   const addCredits = (amount: number) => {
     setCredits((c) => c + amount);
-    setModalOpen(false);
-    setModalNote('');
-    game.setMessage(`Added ${creditsWord(amount)} — good luck!`);
+    setCreditsOpen(false);
+    setCreditsNote('');
     sounds.blip();
   };
 
@@ -153,15 +125,14 @@ export default function App() {
 
   const resetBalance = () => {
     const label = creditsWord(startingBalance);
-    setModalOpen(false);
+    setCreditsOpen(false);
     setConfirmReq({
       title: 'Clear balance?',
       message: `Your balance will start over at ${label}. This can't be undone.`,
       confirmLabel: 'Clear balance',
       action: () => {
         setCredits(startingBalance);
-        setModalNote('');
-        game.setMessage(`Balance reset to ${label}`);
+        setCreditsNote('');
         sounds.blip();
       },
     });
@@ -174,8 +145,6 @@ export default function App() {
       confirmLabel: 'Delete profile',
       action: () => profiles.deleteProfile(name),
     });
-
-  const howToModal = howToOpen && <HowToPlayModal onClose={() => setHowToOpen(false)} />;
 
   const confirmModal = confirmReq && (
     <ConfirmModal
@@ -203,6 +172,15 @@ export default function App() {
     />
   );
 
+  const howToModal =
+    howToOpen === 'poker' ? (
+      <HowToPlayModal onClose={() => setHowToOpen(null)} />
+    ) : howToOpen === 'blackjack' ? (
+      <BlackjackHelpModal onClose={() => setHowToOpen(null)} />
+    ) : howToOpen === 'roulette' ? (
+      <RouletteHelpModal onClose={() => setHowToOpen(null)} />
+    ) : null;
+
   if (!profiles.user) {
     // Balances shown on the landing page — read fresh each time it renders
     const profileSummaries: ProfileSummary[] = profiles.usersList.map((name) => {
@@ -221,112 +199,106 @@ export default function App() {
           onGuest={handleGuest}
           onDelete={requestDeleteProfile}
           onSettings={() => setSettingsOpen(true)}
-          onHowTo={() => setHowToOpen(true)}
         />
         {settingsModal}
         {confirmModal}
-        {howToModal}
       </div>
     );
   }
 
   const userLabel = profiles.isGuest ? 'Guest' : profiles.user;
-  const statsSummary =
-    stats.hands > 0
-      ? `${stats.hands} hands · ${((stats.handsWon / stats.hands) * 100).toFixed(1)}% won`
-      : undefined;
+  const totalPlays = stats.hands + bjStats.hands + rouletteStats.spins;
+  const statsSummary = totalPlays > 0 ? `${totalPlays} plays · ${fmt(credits)} balance` : undefined;
 
-  return (
-    <div className="app">
-      <main className="machine">
-        <div className="topbar">
+  const topbar = (
+    <>
+      <div className="topbar-left">
+        {game !== null && (
           <button
             type="button"
             className="icon-btn"
-            title="Settings"
-            aria-label="Settings"
-            onClick={() => setSettingsOpen(true)}
+            title="Back to games"
+            aria-label="Back to games"
+            onClick={() => guardRound('Leave the table?', () => setGame(null))}
           >
-            <GearIcon />
+            <BackIcon />
           </button>
-          <AccountMenu
-            userLabel={userLabel}
-            isGuest={profiles.isGuest}
-            statsSummary={statsSummary}
-            onStats={() => setStatsOpen(true)}
-            onHowTo={() => setHowToOpen(true)}
-            onFeedback={() => setFeedbackOpen(true)}
-            onSignOut={handleSignOut}
-          />
-        </div>
+        )}
+        <button
+          type="button"
+          className="icon-btn"
+          title="Settings"
+          aria-label="Settings"
+          onClick={() => setSettingsOpen(true)}
+        >
+          <GearIcon />
+        </button>
+      </div>
+      <AccountMenu
+        userLabel={userLabel}
+        isGuest={profiles.isGuest}
+        statsSummary={statsSummary}
+        onStats={() => setStatsOpen(true)}
+        onHowTo={game !== null ? () => setHowToOpen(game) : undefined}
+        onFeedback={() => setFeedbackOpen(true)}
+        onSignOut={() =>
+          guardRound(profiles.isGuest ? 'Sign in?' : 'Sign out?', handleSignOut)
+        }
+      />
+    </>
+  );
 
-        <Marquee />
-
-        <Paytable bet={bet} winRank={game.winRank} />
-
-        <div className="message-area">
-          <div className={`message${game.win > 0 ? ' win' : ''}`}>{game.message || ' '}</div>
-          <div className="trainer-note">{game.trainerNote || ' '}</div>
-        </div>
-
-        <div className="cards">
-          {game.hand.map((c, i) => (
-            <CardView
-              key={i}
-              card={c}
-              faceUp={game.faceUp[i]}
-              held={game.held[i]}
-              hinted={game.hintMask !== null && (game.hintMask & (1 << i)) !== 0}
-              clickable={game.phase === 'holding' && !game.busy}
-              onClick={() => game.toggleHold(i)}
-            />
-          ))}
-        </div>
-
-        <Console
-          balanceLabel={fmt(creditsDisplay)}
-          betLabel={fmt(bet)}
-          winLabel={fmt(game.win)}
+  return (
+    <div className="app">
+      {game === null && (
+        <GameSelect
+          topbar={topbar}
+          balanceLabel={fmt(credits)}
           dollars={dollars}
-          phase={game.phase}
-          busy={game.busy}
           onToggleDollars={() => profiles.setDollars((d) => !d)}
-          onAddCredits={() => {
-            setModalNote('');
-            setModalOpen(true);
-          }}
-          onBetOne={betOne}
-          onBetMax={betMax}
-          onHint={game.showHint}
-          onPrimary={dealOrDraw}
+          onPick={setGame}
+          onAddCredits={openCredits}
         />
-
-        <StatusBar
-          soundOn={soundOn}
-          trainer={trainer}
-          dollars={dollars}
-          onToggleSound={() => profiles.setSoundOn((v) => !v)}
-          onToggleTrainer={() => profiles.setTrainer((v) => !v)}
-          onToggleDollars={() => profiles.setDollars((v) => !v)}
+      )}
+      {game === 'poker' && (
+        <PokerGame
+          profiles={profiles}
+          topbar={topbar}
+          keyboardActive={!anyModalOpen}
+          fmt={fmt}
+          fmtEV={fmtEV}
+          onInsufficient={onInsufficient}
+          onAddCredits={openCredits}
+          onRoundLive={setRoundLive}
         />
+      )}
+      {game === 'blackjack' && (
+        <BlackjackGame
+          profiles={profiles}
+          topbar={topbar}
+          fmt={fmt}
+          onInsufficient={onInsufficient}
+          onAddCredits={openCredits}
+          onRoundLive={setRoundLive}
+        />
+      )}
+      {game === 'roulette' && (
+        <RouletteGame
+          profiles={profiles}
+          topbar={topbar}
+          fmt={fmt}
+          onAddCredits={openCredits}
+        />
+      )}
 
-        <p className="disclaimer">
-          For entertainment &amp; practice only — play money, no real wagering. Cards are dealt
-          from a full 52-card deck with a cryptographic shuffle; the 9/6 paytable returns 99.54%
-          with optimal play.
-        </p>
-
-        {game.celebration && <WinOverlay {...game.celebration} />}
-      </main>
-
-      {modalOpen && (
+      {creditsOpen && (
         <CreditsModal
-          note={modalNote}
+          note={creditsNote}
           format={fmt}
           startingBalance={startingBalance}
           onAdd={addCredits}
           onReset={resetBalance}
-          onClose={() => setModalOpen(false)}
+          onClose={() => setCreditsOpen(false)}
         />
       )}
 
@@ -342,6 +314,8 @@ export default function App() {
         <StatsModal
           user={userLabel}
           stats={stats}
+          bjStats={bjStats}
+          rouletteStats={rouletteStats}
           format={fmt}
           onReset={() => {
             profiles.resetStats();

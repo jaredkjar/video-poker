@@ -126,6 +126,12 @@ button {
   margin-bottom: clamp(6px, 1.2vw, 12px);
 }
 
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .icon-btn {
   flex: none;
   width: 38px;
@@ -897,7 +903,8 @@ button {
   position: relative;
   width: 280px;
   height: 124px;
-  margin: 22px auto 8px;
+  /* the fanned side cards' tips reach below the container — pad for them */
+  margin: 22px auto 30px;
 }
 
 .fan-card {
@@ -962,7 +969,7 @@ button {
   text-transform: uppercase;
   color: var(--text-dim);
   font-weight: 600;
-  margin: 18px 0 16px;
+  margin: 24px 0 18px;
 }
 
 .profiles {
@@ -1185,6 +1192,545 @@ button {
   opacity: 0.6;
 }
 
+/* ---------- Lobby (game select) ---------- */
+
+.machine.lobby {
+  max-width: 680px;
+  margin-top: clamp(20px, 6vh, 60px);
+}
+
+.display.lobby-balance {
+  margin: clamp(14px, 2.5vw, 22px) auto 0;
+  min-width: min(280px, 80%);
+  width: fit-content;
+  padding: 12px 34px 14px;
+}
+
+.display.lobby-balance strong {
+  font-size: calc(clamp(26px, 4.5vw, 34px) * var(--ts));
+}
+
+.display.lobby-balance label {
+  font-size: calc(11px * var(--ts));
+  margin-bottom: 4px;
+}
+
+.lobby-heading {
+  font-size: calc(14px * var(--ts));
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  font-weight: 600;
+  text-align: center;
+  margin: clamp(14px, 2.5vw, 24px) 0 16px;
+}
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.game-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: clamp(16px, 3vw, 24px) 14px 18px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, transform 0.12s ease;
+}
+
+.game-tile:hover {
+  border-color: var(--gold-soft);
+  background: rgba(233, 189, 90, 0.05);
+  transform: translateY(-2px);
+}
+
+.tile-visual {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tile-cards {
+  position: relative;
+  display: flex;
+}
+
+.tile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  width: 42px;
+  height: 58px;
+  background: var(--card-face);
+  border-radius: 5px;
+  font-weight: 700;
+  font-size: 18px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  transform: rotate(-8deg);
+}
+
+.tile-card small {
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.tile-card + .tile-card {
+  margin-left: -14px;
+  transform: rotate(10deg) translateY(2px);
+}
+
+.tile-card.red {
+  color: var(--suit-red);
+}
+
+.tile-card.black {
+  color: var(--suit-black);
+}
+
+.tile-badge {
+  position: absolute;
+  bottom: -8px;
+  right: -12px;
+  background: var(--gold);
+  color: #1a1200;
+  font-weight: 700;
+  font-size: 12px;
+  border-radius: 999px;
+  padding: 3px 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.tile-wheel {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 3px solid var(--gold-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: conic-gradient(
+    #1d6b45 0 12deg,
+    #8f2231 12deg 55deg,
+    #191d24 55deg 99deg,
+    #8f2231 99deg 142deg,
+    #191d24 142deg 186deg,
+    #8f2231 186deg 229deg,
+    #191d24 229deg 273deg,
+    #8f2231 273deg 316deg,
+    #191d24 316deg 360deg
+  );
+}
+
+.tile-wheel-hub {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--gold-dim);
+}
+
+.tile-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.tile-name {
+  font-size: calc(17px * var(--ts));
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.tile-blurb {
+  font-size: calc(12px * var(--ts));
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+.lobby-foot {
+  margin: 22px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: calc(12px * var(--ts));
+  color: var(--text-dim);
+  opacity: 0.75;
+}
+
+.lobby-foot strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Blackjack table ---------- */
+
+/*
+ * Blackjack and roulette bets can grow to many digits, so their consoles
+ * always stack: displays on one row, actions below. Otherwise a widening
+ * BET display reflows the buttons onto a new row mid-round.
+ */
+.machine.blackjack .console,
+.machine.roulette .console {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.machine.blackjack .displays,
+.machine.roulette .displays {
+  justify-content: center;
+}
+
+.machine.blackjack .display,
+.machine.roulette .display {
+  flex: 1;
+  min-width: 0;
+}
+
+.machine.blackjack .buttons,
+.machine.roulette .buttons {
+  justify-content: center;
+}
+
+.bj-table {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vw, 20px);
+  margin: clamp(6px, 1.2vw, 12px) 0 clamp(10px, 1.8vw, 16px);
+}
+
+.bj-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.bj-row-label {
+  font-size: calc(12px * var(--ts));
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.bj-value {
+  color: var(--gold);
+}
+
+.bj-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(6px, 1.2vw, 10px);
+}
+
+.bj-cards .card-slot {
+  padding-top: 0;
+  width: clamp(58px, 11vw, 92px);
+}
+
+.bj-placeholder {
+  width: clamp(58px, 11vw, 92px);
+  aspect-ratio: 5 / 7;
+  border: 1px dashed var(--border-strong);
+  border-radius: clamp(6px, 1.1vw, 9px);
+  opacity: 0.5;
+}
+
+/* ---------- Roulette table ---------- */
+
+.machine.roulette {
+  width: min(960px, 100%);
+}
+
+.rl-board {
+  display: grid;
+  grid-template-columns: minmax(30px, auto) minmax(0, 1fr) minmax(38px, auto);
+  grid-template-areas:
+    'zero nums cols'
+    '.    dozens .'
+    '.    evens  .';
+  gap: 4px;
+  margin: clamp(6px, 1.2vw, 12px) 0 clamp(10px, 1.8vw, 16px);
+}
+
+.rb-nums {
+  grid-area: nums;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rb-numrow {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 4px;
+}
+
+.rb-colbets {
+  grid-area: cols;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rb-colbets .rb-cell {
+  flex: 1;
+}
+
+.rb-dozens {
+  grid-area: dozens;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.rb-evens {
+  grid-area: evens;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+
+.rb-cell {
+  position: relative;
+  font: inherit;
+  font-size: calc(clamp(11px, 1.6vw, 14px) * var(--ts));
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  min-height: clamp(28px, 4.5vw, 38px);
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.1s ease, outline-color 0.1s ease;
+}
+
+.rb-cell:hover {
+  filter: brightness(1.25);
+}
+
+.rb-cell.red {
+  background: #8f2231;
+  border-color: #a53a49;
+}
+
+.rb-cell.black {
+  background: #14181f;
+  border-color: #3a4150;
+}
+
+.rb-cell.green,
+.rb-zero.green {
+  background: #1d6b45;
+  border-color: #348a5f;
+}
+
+.rb-zero {
+  grid-area: zero;
+  font-size: calc(clamp(14px, 2vw, 18px) * var(--ts));
+}
+
+.rb-out {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-indent: 0.06em;
+  color: var(--text-dim);
+}
+
+.rb-out:hover {
+  color: var(--text);
+}
+
+.rb-out.red-diamond::before,
+.rb-out.black-diamond::before {
+  content: '◆';
+  font-size: 1.2em;
+}
+
+.rb-out.red-diamond::before {
+  color: #d4485c;
+}
+
+.rb-out.black-diamond::before {
+  color: #7d8798;
+}
+
+.rb-cell.hit {
+  outline: 2px solid var(--gold);
+  outline-offset: -1px;
+  box-shadow: 0 0 12px var(--gold-soft);
+  animation: cellPop 0.3s ease;
+}
+
+/* A placed chip sits centered on its bet square, like on a real table */
+.rb-chip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 21px;
+  height: 21px;
+  border-radius: 999px;
+  background: var(--gold);
+  border: 1.5px dashed rgba(26, 18, 0, 0.4);
+  color: #1a1200;
+  font-size: 10.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.rl-history {
+  margin-top: 6px;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.rl-history-label {
+  font-size: calc(11px * var(--ts));
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-right: 4px;
+}
+
+.hist-chip {
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #f2f4f7;
+}
+
+.hist-chip.red {
+  background: #8f2231;
+}
+
+.hist-chip.black {
+  background: #14181f;
+  border: 1px solid #3a4150;
+}
+
+.hist-chip.green {
+  background: #1d6b45;
+}
+
+.rl-actions {
+  align-items: center;
+}
+
+.chip-row {
+  display: flex;
+  gap: 7px;
+  margin-right: 4px;
+}
+
+.chip-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px dashed var(--border-strong);
+  background: var(--well);
+  color: var(--text-dim);
+  font: inherit;
+  font-size: calc(14px * var(--ts));
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+/* Dollar chip values ("$6.25") need a smaller face to fit the circle */
+.chip-btn.small {
+  font-size: calc(11px * var(--ts));
+  letter-spacing: -0.01em;
+}
+
+.chip-btn:hover {
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+
+.chip-btn.selected {
+  border-style: solid;
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* Spinning wheel shown while the ball is in play */
+.wheel-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 8, 7, 0.72);
+  backdrop-filter: blur(3px);
+  border-radius: 16px;
+  animation: wheelIn 0.3s ease;
+}
+
+@keyframes wheelIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.wheel-stack {
+  position: relative;
+  width: min(340px, 72vw, 62vh);
+  aspect-ratio: 1;
+  filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.55));
+}
+
+.wheel-stack svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 /* ---------- Stats modal ---------- */
 
 .modal.stats-modal {
@@ -1199,9 +1745,9 @@ button {
 .stats-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0 18px;
+  gap: 24px 20px;
   align-items: start;
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .stats-modal::-webkit-scrollbar {
@@ -1895,6 +2441,80 @@ button {
     grid-template-columns: 1fr;
     gap: 14px 0;
   }
+
+  /* Lobby tiles go horizontal so all three fit without scrolling */
+  .machine.lobby {
+    align-self: center;
+  }
+
+  .game-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .game-tile {
+    flex-direction: row;
+    text-align: left;
+    padding: 12px 16px;
+    gap: 16px;
+  }
+
+  .game-tile .tile-visual {
+    flex: none;
+    width: 76px;
+    height: 56px;
+  }
+
+  .game-tile .tile-card {
+    width: 36px;
+    height: 50px;
+    font-size: 15px;
+  }
+
+  .game-tile .tile-wheel {
+    width: 50px;
+    height: 50px;
+  }
+
+  .game-tile .tile-text {
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* Blackjack: slightly smaller cards keep long hands on one row */
+  .bj-cards .card-slot,
+  .bj-placeholder {
+    width: clamp(46px, 14vw, 64px);
+  }
+
+  /* Roulette: tighten the board so 14 columns fit a phone */
+  .rl-board,
+  .rb-nums,
+  .rb-numrow,
+  .rb-colbets,
+  .rb-dozens,
+  .rb-evens {
+    gap: 2px;
+  }
+
+  .rb-cell {
+    border-radius: 3px;
+    min-height: 26px;
+  }
+
+  .rb-chip {
+    min-width: 17px;
+    height: 17px;
+    font-size: 9px;
+  }
+
+  .chip-row {
+    justify-content: center;
+  }
+
+  .rl-actions {
+    justify-content: center;
+  }
 }
 
 /* ---------- Landscape phones (iPhone sideways) ---------- */
@@ -1914,7 +2534,9 @@ button {
       calc(8px + env(safe-area-inset-left, 0px));
   }
 
-  .machine:not(.login) {
+  /* The two-column landscape grid is poker-specific; blackjack, roulette,
+     and the lobby keep their normal flow and scroll if they must. */
+  .machine.poker {
     width: min(1000px, 100%);
     padding: 10px 14px;
     display: grid;

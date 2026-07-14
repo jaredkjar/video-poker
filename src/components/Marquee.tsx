@@ -1,10 +1,22 @@
-export function Marquee() {
+import type { ReactNode } from 'react';
+
+interface Props {
+  /** Defaults to the "Jacks or Better" house brand. */
+  title?: ReactNode;
+  tagline: string;
+}
+
+export function Marquee({ title, tagline }: Props) {
   return (
     <header className="marquee">
       <h1>
-        Jacks <em>or</em> Better
+        {title ?? (
+          <>
+            Jacks <em>or</em> Better
+          </>
+        )}
       </h1>
-      <div className="tagline">9 / 6 Video Poker</div>
+      <div className="tagline">{tagline}</div>
       <div className="byline">Developed by Jared Kjar</div>
     </header>
   );

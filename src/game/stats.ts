@@ -16,9 +16,29 @@ export interface Stats {
   handCounts: number[];
 }
 
+export interface BlackjackStats {
+  hands: number;
+  wins: number;
+  pushes: number;
+  blackjacks: number;
+  wagered: number;
+  won: number;
+  biggestWin: number;
+}
+
+export interface RouletteStats {
+  spins: number;
+  wins: number;
+  wagered: number;
+  won: number;
+  biggestWin: number;
+}
+
 export interface SaveData {
   credits: number;
   bet: number;
+  /** Last blackjack wager, restored when the player returns to the table */
+  bjBet: number;
   sound: boolean;
   dollars: boolean;
   denom: number;
@@ -26,6 +46,8 @@ export interface SaveData {
   theme: ThemeId;
   textSize: TextSizeId;
   stats: Stats;
+  bjStats: BlackjackStats;
+  rouletteStats: RouletteStats;
 }
 
 export interface Registry {
@@ -50,6 +72,26 @@ export function emptyStats(): Stats {
   };
 }
 
+export function emptyBjStats(): BlackjackStats {
+  return { hands: 0, wins: 0, pushes: 0, blackjacks: 0, wagered: 0, won: 0, biggestWin: 0 };
+}
+
+export function emptyRouletteStats(): RouletteStats {
+  return { spins: 0, wins: 0, wagered: 0, won: 0, biggestWin: 0 };
+}
+
+/** Fill in any missing numeric fields — profiles saved before a game existed lack its stats. */
+function normalizeGameStats<T extends object>(empty: T, s?: Partial<T>): T {
+  if (!s) return empty;
+  const out = { ...empty };
+  for (const key of Object.keys(empty) as (keyof T)[]) {
+    const v = s[key];
+    // every stats field is a number, so anything else is corrupted data
+    if (typeof v === 'number' && Number.isFinite(v)) (out as Record<keyof T, number>)[key] = v;
+  }
+  return out;
+}
+
 function normalizeStats(s?: Partial<Stats>): Stats {
   const base = emptyStats();
   if (!s) return base;
@@ -68,6 +110,7 @@ export function defaultSave(): SaveData {
   return {
     credits: 200,
     bet: 1,
+    bjBet: 5,
     sound: true,
     dollars: false,
     denom: 0.25,
@@ -75,6 +118,8 @@ export function defaultSave(): SaveData {
     theme: prefs.theme,
     textSize: prefs.textSize,
     stats: emptyStats(),
+    bjStats: emptyBjStats(),
+    rouletteStats: emptyRouletteStats(),
   };
 }
 
@@ -122,6 +167,8 @@ export function loadProfile(name: string): SaveData {
         textSize: isTextSizeId(p.textSize) ? p.textSize : base.textSize,
         trainer: typeof p.trainer === 'boolean' ? p.trainer : base.trainer,
         stats: normalizeStats(p.stats),
+        bjStats: normalizeGameStats(emptyBjStats(), p.bjStats),
+        rouletteStats: normalizeGameStats(emptyRouletteStats(), p.rouletteStats),
       };
     }
   } catch {

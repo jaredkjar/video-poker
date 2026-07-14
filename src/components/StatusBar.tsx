@@ -1,10 +1,11 @@
 interface Props {
   soundOn: boolean;
-  trainer: boolean;
   dollars: boolean;
+  /** Poker-only strategy trainer — omit to hide the pill. */
+  trainer?: boolean;
   onToggleSound: () => void;
-  onToggleTrainer: () => void;
   onToggleDollars: () => void;
+  onToggleTrainer?: () => void;
 }
 
 function TogglePill({ label, on, onClick }: { label: string; on: boolean; onClick: () => void }) {
@@ -32,7 +33,9 @@ export function StatusBar({
     <footer className="statusbar">
       <div className="pill-group">
         <TogglePill label="Sound" on={soundOn} onClick={onToggleSound} />
-        <TogglePill label="Trainer" on={trainer} onClick={onToggleTrainer} />
+        {onToggleTrainer && (
+          <TogglePill label="Trainer" on={trainer ?? false} onClick={onToggleTrainer} />
+        )}
         <TogglePill label="Dollars" on={dollars} onClick={onToggleDollars} />
       </div>
     </footer>
