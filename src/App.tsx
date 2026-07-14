@@ -26,6 +26,8 @@ export default function App() {
 
   // null = lobby (game select); shown only while signed in
   const [game, setGame] = useState<GameId | null>(null);
+  // True while a wager is unresolved in the current game (reported by the game screens)
+  const [roundLive, setRoundLive] = useState(false);
 
   const [creditsOpen, setCreditsOpen] = useState(false);
   const [creditsNote, setCreditsNote] = useState('');
@@ -83,6 +85,23 @@ export default function App() {
     setGame(null);
     setStatsOpen(false);
     setCreditsOpen(false);
+  };
+
+  /** Run `action` immediately, or confirm first when a wager would be forfeited. */
+  const guardRound = (title: string, action: () => void) => {
+    if (!roundLive) {
+      action();
+      return;
+    }
+    setConfirmReq({
+      title,
+      message: 'You have a hand in play — leaving now forfeits your bet.',
+      confirmLabel: 'Leave anyway',
+      action: () => {
+        setRoundLive(false);
+        action();
+      },
+    });
   };
 
   const openCredits = () => {
@@ -200,7 +219,7 @@ export default function App() {
             className="icon-btn"
             title="Back to games"
             aria-label="Back to games"
-            onClick={() => setGame(null)}
+            onClick={() => guardRound('Leave the table?', () => setGame(null))}
           >
             <BackIcon />
           </button>
@@ -222,7 +241,9 @@ export default function App() {
         onStats={() => setStatsOpen(true)}
         onHowTo={game !== null ? () => setHowToOpen(game) : undefined}
         onFeedback={() => setFeedbackOpen(true)}
-        onSignOut={handleSignOut}
+        onSignOut={() =>
+          guardRound(profiles.isGuest ? 'Sign in?' : 'Sign out?', handleSignOut)
+        }
       />
     </>
   );
@@ -246,6 +267,7 @@ export default function App() {
           fmtEV={fmtEV}
           onInsufficient={onInsufficient}
           onAddCredits={openCredits}
+          onRoundLive={setRoundLive}
         />
       )}
       {game === 'blackjack' && (
@@ -255,6 +277,7 @@ export default function App() {
           fmt={fmt}
           onInsufficient={onInsufficient}
           onAddCredits={openCredits}
+          onRoundLive={setRoundLive}
         />
       )}
       {game === 'roulette' && (

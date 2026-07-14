@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { MAX_BET } from '../../game/cards';
 import * as sounds from '../../game/sounds';
 import { useCountUp } from '../../hooks/useCountUp';
@@ -23,6 +23,8 @@ interface Props {
   fmtEV: (v: number) => string;
   onInsufficient: (betAmount: number) => void;
   onAddCredits: () => void;
+  /** Reports whether a wager is currently unresolved (bet placed, hand not drawn). */
+  onRoundLive: (live: boolean) => void;
 }
 
 /** The original Jacks or Better machine, now one game among several. */
@@ -34,6 +36,7 @@ export function PokerGame({
   fmtEV,
   onInsufficient,
   onAddCredits,
+  onRoundLive,
 }: Props) {
   const { credits, setCredits, bet, setBet, dollars, trainer } = profiles;
 
@@ -68,6 +71,13 @@ export function PokerGame({
   });
 
   const creditsDisplay = useCountUp(credits);
+
+  // The wager is at risk from the moment DEAL deducts it until the draw settles
+  const roundLive = game.busy || game.phase === 'holding';
+  useEffect(() => {
+    onRoundLive(roundLive);
+  }, [roundLive, onRoundLive]);
+  useEffect(() => () => onRoundLive(false), [onRoundLive]);
 
   const betOne = () => {
     if (game.phase === 'holding' || game.busy) return;

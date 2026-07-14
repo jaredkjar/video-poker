@@ -1557,14 +1557,17 @@ button {
   animation: cellPop 0.3s ease;
 }
 
+/* A placed chip sits centered on its bet square, like on a real table */
 .rb-chip {
   position: absolute;
-  top: -7px;
-  right: -6px;
-  min-width: 19px;
-  height: 19px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 21px;
+  height: 21px;
   border-radius: 999px;
   background: var(--gold);
+  border: 1.5px dashed rgba(26, 18, 0, 0.4);
   color: #1a1200;
   font-size: 10.5px;
   font-weight: 700;
@@ -2462,10 +2465,8 @@ button {
   }
 
   .rb-chip {
-    top: -5px;
-    right: -4px;
-    min-width: 16px;
-    height: 16px;
+    min-width: 17px;
+    height: 17px;
     font-size: 9px;
   }
 

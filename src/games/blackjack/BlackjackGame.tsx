@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { newDeck, type Card } from '../../game/cards';
 import * as sounds from '../../game/sounds';
 import { useCountUp } from '../../hooks/useCountUp';
@@ -19,9 +19,18 @@ interface Props {
   fmt: (amount: number) => string;
   onInsufficient: (betAmount: number) => void;
   onAddCredits: () => void;
+  /** Reports whether a wager is currently unresolved (cards dealt, hand not settled). */
+  onRoundLive: (live: boolean) => void;
 }
 
-export function BlackjackGame({ profiles, topbar, fmt, onInsufficient, onAddCredits }: Props) {
+export function BlackjackGame({
+  profiles,
+  topbar,
+  fmt,
+  onInsufficient,
+  onAddCredits,
+  onRoundLive,
+}: Props) {
   const { credits, setCredits, bjBet, setBjBet, dollars } = profiles;
 
   const [playerCards, setPlayerCards] = useState<Card[]>([]);
@@ -36,6 +45,14 @@ export function BlackjackGame({ profiles, topbar, fmt, onInsufficient, onAddCred
   const deckRef = useRef<Card[]>([]);
   const busyRef = useRef(false);
   const creditsDisplay = useCountUp(credits);
+
+  // At risk from the moment DEAL deducts the bet until the hand settles;
+  // `busy` covers the deal animation while the phase is still 'betting'.
+  const roundLive = busy || phase === 'player' || phase === 'dealer';
+  useEffect(() => {
+    onRoundLive(roundLive);
+  }, [roundLive, onRoundLive]);
+  useEffect(() => () => onRoundLive(false), [onRoundLive]);
 
   const drawCard = () => deckRef.current.pop()!;
 
