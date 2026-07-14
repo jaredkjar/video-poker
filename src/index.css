@@ -809,6 +809,10 @@ button {
   color: var(--gold);
   font-size: 15px;
   line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: border-color 0.12s ease, color 0.12s ease;
 }
@@ -1551,6 +1555,16 @@ button {
 .uth-table .bj-cards .card-slot,
 .uth-table .bj-placeholder {
   width: clamp(46px, 8.5vw, 74px);
+}
+
+/* Card faces are sized for poker's big cards — scale the type down to
+   match these smaller ones or the corners crowd the whole face */
+.uth-table .corner {
+  font-size: calc(clamp(10px, 1.9vw, 15px) * var(--ts));
+}
+
+.uth-table .pip {
+  font-size: clamp(18px, 3.6vw, 32px);
 }
 
 .uth-bets {
