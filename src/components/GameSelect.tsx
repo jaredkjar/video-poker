@@ -59,15 +59,31 @@ interface Props {
   topbar: ReactNode;
   balanceLabel: string;
   onPick: (game: GameId) => void;
+  onAddCredits: () => void;
 }
 
 /** The casino floor: pick a game to play. Shown right after choosing a profile. */
-export function GameSelect({ topbar, balanceLabel, onPick }: Props) {
+export function GameSelect({ topbar, balanceLabel, onPick, onAddCredits }: Props) {
   return (
     <main className="machine lobby">
       <div className="topbar">{topbar}</div>
 
-      <Marquee tagline="Video Poker · Blackjack · Roulette" />
+      <Marquee
+        title={
+          <>
+            Lucky Jack's <em>Casino</em>
+          </>
+        }
+        tagline="Video Poker · Blackjack · Roulette"
+      />
+
+      <div className="display lobby-balance">
+        <label>Balance</label>
+        <strong className="amber">{balanceLabel}</strong>
+        <button type="button" className="add-btn" title="Add credits" onClick={onAddCredits}>
+          +
+        </button>
+      </div>
 
       <h2 className="lobby-heading">Choose your game</h2>
 
@@ -84,8 +100,8 @@ export function GameSelect({ topbar, balanceLabel, onPick }: Props) {
       </div>
 
       <p className="lobby-foot">
-        Balance: <strong>{balanceLabel}</strong> — shared across every game. For entertainment
-        &amp; practice only; play money has no cash value.
+        One balance, shared across every game. For entertainment &amp; practice only; play
+        money has no cash value.
       </p>
     </main>
   );

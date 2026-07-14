@@ -84,7 +84,14 @@ export function LoginScreen({ users, onLogin, onGuest, onDelete, onSettings }: P
         <GearIcon />
       </button>
 
-      <Marquee tagline="Video Poker · Blackjack · Roulette" />
+      <Marquee
+        title={
+          <>
+            Lucky Jack's <em>Casino</em>
+          </>
+        }
+        tagline="Video Poker · Blackjack · Roulette"
+      />
 
       <div className="fan" aria-hidden="true">
         {FAN_CARDS.map((c) => (

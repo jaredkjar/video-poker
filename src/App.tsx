@@ -230,7 +230,12 @@ export default function App() {
   return (
     <div className="app">
       {game === null && (
-        <GameSelect topbar={topbar} balanceLabel={creditsWord(credits)} onPick={setGame} />
+        <GameSelect
+          topbar={topbar}
+          balanceLabel={fmt(credits)}
+          onPick={setGame}
+          onAddCredits={openCredits}
+        />
       )}
       {game === 'poker' && (
         <PokerGame

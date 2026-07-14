@@ -6,6 +6,7 @@ import { Marquee } from '../../components/Marquee';
 import { StatusBar } from '../../components/StatusBar';
 import { WinOverlay, type Celebration } from '../../components/WinOverlay';
 import { colorOf, resolveBets, spinWheel, type Bets } from './engine';
+import { RouletteWheel, SPIN_MS } from './RouletteWheel';
 
 const CHIP_VALUES = [1, 5, 10, 25];
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
@@ -25,7 +26,7 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
   const [bets, setBets] = useState<Bets>({});
   const [chip, setChip] = useState(5);
   const [spinning, setSpinning] = useState(false);
-  const [flash, setFlash] = useState<number | null>(null);
+  const [wheelTarget, setWheelTarget] = useState<number | null>(null);
   const [result, setResult] = useState<number | null>(null);
   const [history, setHistory] = useState<number[]>([]);
   const [win, setWin] = useState(0);
@@ -92,18 +93,19 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
     setCelebration(null);
 
     const final = spinWheel();
+    setWheelTarget(final);
 
-    // The ball slows down: quick random flashes stretching out until it lands
-    const flashes = 22;
-    for (let i = 0; i < flashes; i++) {
-      setFlash(spinWheel());
-      if (i % 2 === 0) sounds.blip();
-      await sleep(45 + i * i * 0.55);
+    // Tick along with the decelerating wheel, then let it rest a beat
+    const spinDone = sleep(SPIN_MS + 650);
+    for (let i = 0; i < 24; i++) {
+      sounds.blip();
+      await sleep(55 + i * i * 0.5);
     }
-    setFlash(null);
+    await spinDone;
+    setWheelTarget(null);
     setResult(final);
     sounds.dealTick(2);
-    await sleep(350);
+    await sleep(300);
 
     const returned = resolveBets(bets, final);
     if (returned > 0) setCredits((c) => c + returned);
@@ -145,9 +147,7 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
     <button
       key={n}
       type="button"
-      className={`rb-cell rb-num ${colorOf(n)}${flash === n ? ' flash' : ''}${
-        result === n ? ' hit' : ''
-      }`}
+      className={`rb-cell rb-num ${colorOf(n)}${result === n ? ' hit' : ''}`}
       onClick={() => placeBet(`n${n}`)}
       aria-label={`Bet on ${n}`}
     >
@@ -188,9 +188,7 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
       <div className="rl-board">
         <button
           type="button"
-          className={`rb-cell rb-zero green${flash === 0 ? ' flash' : ''}${
-            result === 0 ? ' hit' : ''
-          }`}
+          className={`rb-cell rb-zero green${result === 0 ? ' hit' : ''}`}
           onClick={() => placeBet('n0')}
         >
           0{chipOn('n0')}
@@ -308,6 +306,7 @@ export function RouletteGame({ profiles, topbar, fmt, onAddCredits }: Props) {
         columns 2:1, even-money bets 1:1.
       </p>
 
+      {wheelTarget !== null && <RouletteWheel target={wheelTarget} />}
       {celebration && <WinOverlay {...celebration} />}
     </main>
   );

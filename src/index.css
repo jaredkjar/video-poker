@@ -903,7 +903,8 @@ button {
   position: relative;
   width: 280px;
   height: 124px;
-  margin: 22px auto 8px;
+  /* the fanned side cards' tips reach below the container — pad for them */
+  margin: 22px auto 30px;
 }
 
 .fan-card {
@@ -968,7 +969,7 @@ button {
   text-transform: uppercase;
   color: var(--text-dim);
   font-weight: 600;
-  margin: 18px 0 16px;
+  margin: 24px 0 18px;
 }
 
 .profiles {
@@ -1198,6 +1199,22 @@ button {
   margin-top: clamp(20px, 6vh, 60px);
 }
 
+.display.lobby-balance {
+  margin: clamp(14px, 2.5vw, 22px) auto 0;
+  min-width: min(280px, 80%);
+  width: fit-content;
+  padding: 12px 34px 14px;
+}
+
+.display.lobby-balance strong {
+  font-size: calc(clamp(26px, 4.5vw, 34px) * var(--ts));
+}
+
+.display.lobby-balance label {
+  font-size: calc(11px * var(--ts));
+  margin-bottom: 4px;
+}
+
 .lobby-heading {
   font-size: calc(14px * var(--ts));
   letter-spacing: 0.22em;
@@ -1371,6 +1388,7 @@ button {
 .bj-row {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 7px;
 }
 
@@ -1389,6 +1407,7 @@ button {
 .bj-cards {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: clamp(6px, 1.2vw, 10px);
 }
 
@@ -1465,6 +1484,8 @@ button {
   font: inherit;
   font-size: calc(clamp(11px, 1.6vw, 14px) * var(--ts));
   font-weight: 600;
+  line-height: 1;
+  text-align: center;
   font-variant-numeric: tabular-nums;
   color: var(--text);
   background: var(--surface-2);
@@ -1507,6 +1528,7 @@ button {
 .rb-out {
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  text-indent: 0.06em;
   color: var(--text-dim);
 }
 
@@ -1526,12 +1548,6 @@ button {
 
 .rb-out.black-diamond::before {
   color: #7d8798;
-}
-
-.rb-cell.flash {
-  outline: 2px solid var(--amber);
-  outline-offset: -1px;
-  filter: brightness(1.4);
 }
 
 .rb-cell.hit {
@@ -1640,6 +1656,40 @@ button {
   color: var(--gold);
 }
 
+/* Spinning wheel shown while the ball is in play */
+.wheel-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 8, 7, 0.72);
+  backdrop-filter: blur(3px);
+  border-radius: 16px;
+  animation: wheelIn 0.3s ease;
+}
+
+@keyframes wheelIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.wheel-stack {
+  position: relative;
+  width: min(340px, 72vw, 62vh);
+  aspect-ratio: 1;
+  filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.55));
+}
+
+.wheel-stack svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 /* ---------- Stats modal ---------- */
 
 .modal.stats-modal {
@@ -1654,9 +1704,9 @@ button {
 .stats-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0 18px;
+  gap: 24px 20px;
   align-items: start;
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .stats-modal::-webkit-scrollbar {
